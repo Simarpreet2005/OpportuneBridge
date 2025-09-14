@@ -76,7 +76,7 @@ export const login = async (req, res) => {
     });
 
     user = {
-      _id: user_id,
+      _id: user._id,
       fullName: user.fullname,
       email: user.email,
       phoneNumber: user.phoneNumber,
@@ -87,7 +87,7 @@ export const login = async (req, res) => {
       .status(200)
       .cookie("token", token, {
         maxAge: 1 * 24 * 60 * 60 * 1000,
-        httpsOnly: true,
+        httpOnly: true,
         sameSite: "strict",
       })
       .json({
@@ -130,17 +130,15 @@ export const updateProfile = async (req, res) => {
     const userId = req.id; // middleware authentication
     let user = await User.findById(userId);
     if (!user) {
-      return (
-        res.status(400),
+      return res.status(400),
         json({
           message: "User not found",
           success: false,
-        })
-      );
+        });
     }
-    (user.fullname = fullname),
-      (user.email = email),
-      (user.phoneNumber = phoneNumber),
+    (user.fullname = fullname);
+      (user.email = email);
+      (user.phoneNumber = phoneNumber);
       (user.profile.bio = bio);
     user.profile.skills = skillsArray;
 
@@ -149,8 +147,8 @@ export const updateProfile = async (req, res) => {
     await user.save();
 
     user = {
-      _id: user_id,
-      fullName: user.fullname,
+      _id: user._id,
+      fullname: user.fullname,
       email: user.email,
       phoneNumber: user.phoneNumber,
       role: user.role,
