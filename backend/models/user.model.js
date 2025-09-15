@@ -34,4 +34,4 @@ profile:{
     }
 },
 },{timestamps:true});
-export const User=mongoose.modal('User',userSchema);
+export const User=mongoose.model('User',userSchema);
