@@ -61,3 +61,14 @@ export const getCompanyById=async(req,res)=>{
         console.log(error);
     }
 }
+export const updateCompany=async(req,res)=>{
+    try{
+        const{name,description,website,location}=req.body;
+        const file=req.file;
+        // cloudinary comes here
+        const updateData={name,description,website,location};
+        const company=await Company.findById
+    }catch(error){
+        console.log(error);
+    }
+}
