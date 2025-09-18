@@ -1,6 +1,6 @@
 import express from "express";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
-import{getCompany,getCompanyById,registerCompany} from "../controllers/company.controller.js";
+import{getCompany,getCompanyById,registerCompany,updateCompany} from "../controllers/company.controller.js";
 const router=express.Router();
 
 router.route("/register").post(registerCompany);
