@@ -1,43 +1,79 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+
 export const register = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, password, role } = req.body;
+    
     if (!fullname || !email || !phoneNumber || !password || !role) {
       return res.status(400).json({
-        message: "Something is missing",
+        message: "All fields are required",
         success: false,
       });
     }
-    const user = await User.findOne({ email });
-    if (user) {
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return res.status(400).json({
-        message: "User already exist with this email.",
+        message: "User already exists with this email",
         success: false,
       });
     }
+
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({
+    // Create user
+    const user = await User.create({
       fullname,
       email,
       phoneNumber,
       password: hashedPassword,
       role,
     });
+
+    // Remove password from response
+    const userResponse = {
+      _id: user._id,
+      fullname: user.fullname,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      role: user.role,
+      profile: user.profile,
+    };
+
     return res.status(201).json({
-      message: "Account created successfully",
+      message: "User registered successfully",
       success: true,
+      user: userResponse,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Register error:", error);
+    
+    // Handle specific MongoDB errors
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        message: "Validation error: " + Object.values(error.errors).map(e => e.message).join(', '),
+        success: false,
+      });
+    }
+    
+    if (error.code === 11000) {
+      return res.status(400).json({
+        message: "Email already exists",
+        success: false,
+      });
+    }
+    
     return res.status(500).json({
-      message: "Server error",
+      message: "Server error: " + error.message,
       success: false,
     });
   }
 };
+
 export const login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
@@ -46,7 +82,7 @@ export const login = async (req, res) => {
         message: "Something is missing",
         success: false,
       });
-    }
+    };
     let user = await User.findOne({ email });
 
     if (!user) {
@@ -71,13 +107,14 @@ export const login = async (req, res) => {
     const tokenData = {
       userId: user._id,
     };
+
     const token = await jwt.sign(tokenData, process.env.SECRET_KEY, {
-      expiresIn: "1d",
+      expiresIn: '1d'
     });
 
     user = {
       _id: user._id,
-      fullName: user.fullname,
+      fullname: user.fullname,
       email: user.email,
       phoneNumber: user.phoneNumber,
       role: user.role,
@@ -106,6 +143,7 @@ export const logout = async (req, res) => {
   try {
     return res.status(200).cookie("token", "", { maxAge: 0 }).json({
       message: "Logged out Successfully",
+      success:true
     });
   } catch (error) {
     console.error(error);
@@ -119,28 +157,25 @@ export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
     const file = req.file;
-    if (!fullname || !email || !phoneNumber || !bio || !skills) {
-      return res.status(400).json({
-        message: "Something is missing",
-        success: false,
-      });
-    }
+   
     // cloudinary comes here
-    const skillsArray = skills.split(",");
+    let skillsArray;
+    if(skills){skillsArray = skills.split(",");}
     const userId = req.id; // middleware authentication
     let user = await User.findById(userId);
     if (!user) {
-      return res.status(400),
+      return res.status(400).
         json({
           message: "User not found",
           success: false,
         });
     }
-    (user.fullname = fullname);
-      (user.email = email);
-      (user.phoneNumber = phoneNumber);
-      (user.profile.bio = bio);
-    user.profile.skills = skillsArray;
+  //updating data
+   if(fullname) user.fullname = fullname;
+    if(email)  user.email = email;
+    if(phoneNumber)  user.phoneNumber = phoneNumber;
+    if(bio)  user.profile.bio = bio;
+    if(skills)user.profile.skills = skillsArray;
 
     // resume comes later here ...
 
@@ -155,7 +190,7 @@ export const updateProfile = async (req, res) => {
       profile: user.profile,
     };
     return res.status(200).json({
-        message:"Profile updated successfully",user,
+        message:"Profile updated successfully ",user,
         success:true
     })
 
