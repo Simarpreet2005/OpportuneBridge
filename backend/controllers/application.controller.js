@@ -25,8 +25,47 @@ export const applyJob=async(requestAnimationFrame,res)=>{
             message:"Job not found",
             success:false
         })     
-    }}
-    catch(error){
+    }
+    // create a new application
+    const newApplication=await Application.create({ 
+        job:jobId,
+        applicant:userId
+    });
+    job.applications.push(newApplication._id);
+    await job.save();
+    return res.status(201).json({
+        message:"Job applied successfully",
+        success:true
+    })
+    }
+   catch(error){
         console.log(error);
     }
 }
+export const getAppliedJobs=async(req,res)=>{
+    try{
+        const userId=req.id;
+        const application=await Application.find({applicant:userId}).populate({
+            path:'job',
+            options:{sort:{createdAt:-1}},
+            populate:{ 
+                 path:'company',
+ options:{sort:{createdAt:-1}}
+            }
+        });
+        if(!application){
+            return res.status(404).json({
+                message:"No applications found",
+                success:false
+            })
+        }
+        return res.status(200).json({
+            application,
+            success:true
+        })
+    }
+        catch(error){
+            console.log(error); 
+    }
+}
+
