@@ -1,5 +1,5 @@
 import { Job } from "../models/job.model";
-
+// admin creates job
 export const postJob =async(req,res)=>{
 try{
 const{title,description,requirements,salary,location,jobType,experience,position,companyId}=req.body;
@@ -29,6 +29,7 @@ return res.status(201).json({
     console.log(error);
 }
 }
+// for studdent
 export const getAllJobs=async(req,res)=>{
     try{
         const keyword=req.query.keyword || "";
@@ -54,3 +55,23 @@ return res.status(201).json({
         console.log(error);
     }
 }
+// for student
+export const getJobById=async(req,res)=>{
+    try{
+        const jobId=req.params.id;
+        const job=await Job.findById(jobId);
+        if(!job){
+            return res.status(404).json({
+                message:"Job not found",
+                success:false
+        })
+                
+        };
+        return res.status(200).json({
+            job,
+            success:true
+        })
+    }   catch(error){
+        console.log(error);
+    }
+}   
