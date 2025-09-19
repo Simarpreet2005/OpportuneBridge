@@ -112,7 +112,7 @@ export const updateStatus=async(req,res)=>{
                 success:false
             })
         }
-        // update the status
+        // update the status - admin can update the status to accepted or rejected
         application.status=status.toLowerCase();
         await application.save();
         return res.status(200).json({
