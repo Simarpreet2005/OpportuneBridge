@@ -1,6 +1,7 @@
 import express from "express";
+import { applyJob, getApplicants,getAppliedJobs, updateStatus } from "../controllers/application.controller.js";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
-import { getAppliedJobs } from "../controllers/application.controller.js";
+
 const router=express.Router();
 router.route("/apply/:id").get(isAuthenticated,applyJob);
 router.route("/get").get(isAuthenticated,getAppliedJobs);
