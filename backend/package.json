@@ -1,10 +1,10 @@
 {
-  "name": "backend",
+  "name": "opportune-bridge-backend",
   "version": "1.0.0",
   "description": "job portal",
   "repository": {
     "type": "git",
-    "url": "Seize-A-Chance"
+    "url": "OpportuneBridge"
   },
   "license": "MIT",
   "author": "Simarpreet Kaur",
@@ -12,9 +12,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
+    "server": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",
@@ -22,9 +24,14 @@
     "datauri": "^4.1.0",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
+    "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1",
     "multer": "^2.0.2",
+    "nodemailer": "^7.0.12",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.10"
   }
 }

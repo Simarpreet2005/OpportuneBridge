@@ -2,10 +2,19 @@
 export default {
   content: [
     './index.html',
-    './src/**/*.{js,jsx,ts,tsx}', // Ensure all relevant files are included
+    './src/**/*.{js,jsx,ts,tsx}', 
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Outfit', 'system-ui', 'sans-serif'],
+      },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
+      },
+    },
   },
   plugins: [],
 };

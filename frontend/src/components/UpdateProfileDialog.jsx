@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
 import { Label } from './ui/label'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
@@ -19,8 +19,9 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
         email: user?.email || "",
         phoneNumber: user?.phoneNumber || "",
         bio: user?.profile?.bio || "",
-        skills: user?.profile?.skills?.map(skill => skill) || "",
-        file: user?.profile?.resume || ""
+        skills: user?.profile?.skills?.join(",") || "",
+        resume: user?.profile?.resume || "",
+        profilePhoto: user?.profile?.profilePhoto || ""
     });
     const dispatch = useDispatch();
 
@@ -30,7 +31,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
 
     const fileChangeHandler = (e) => {
         const file = e.target.files?.[0];
-        setInput({ ...input, file })
+        setInput({ ...input, [e.target.name]: file })
     }
 
     const submitHandler = async (e) => {
@@ -41,15 +42,15 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
         formData.append("phoneNumber", input.phoneNumber);
         formData.append("bio", input.bio);
         formData.append("skills", input.skills);
-        if (input.file) {
-            formData.append("file", input.file);
+        if (input.resume && typeof input.resume !== 'string') {
+            formData.append("resume", input.resume);
+        }
+        if (input.profilePhoto && typeof input.profilePhoto !== 'string') {
+            formData.append("profilePhoto", input.profilePhoto);
         }
         try {
             setLoading(true);
             const res = await axios.post(`${USER_API_END_POINT}/profile/update`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                },
                 withCredentials: true
             });
             if (res.data.success) {
@@ -57,9 +58,10 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 toast.success(res.data.message);
             }
         } catch (error) {
-            console.log(error);
-            toast.error(error.response.data.message);
-        } finally{
+            console.error("Profile Update Error:", error);
+            const errorMessage = error.response?.data?.message || "An unexpected error occurred during update.";
+            toast.error(errorMessage);
+        } finally {
             setLoading(false);
         }
         setOpen(false);
@@ -74,6 +76,9 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 <DialogContent className="sm:max-w-[425px]" onInteractOutside={() => setOpen(false)}>
                     <DialogHeader>
                         <DialogTitle>Update Profile</DialogTitle>
+                        <DialogDescription>
+                            Make changes to your profile here. Click update when you're done.
+                        </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={submitHandler}>
                         <div className='grid gap-4 py-4'>
@@ -81,7 +86,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                                 <Label htmlFor="name" className="text-right">Name</Label>
                                 <Input
                                     id="name"
-                                    name="name"
+                                    name="fullname"
                                     type="text"
                                     value={input.fullname}
                                     onChange={changeEventHandler}
@@ -103,7 +108,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                                 <Label htmlFor="number" className="text-right">Number</Label>
                                 <Input
                                     id="number"
-                                    name="number"
+                                    name="phoneNumber"
                                     value={input.phoneNumber}
                                     onChange={changeEventHandler}
                                     className="col-span-3"
@@ -130,16 +135,31 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                                 />
                             </div>
                             <div className='grid grid-cols-4 items-center gap-4'>
-                                <Label htmlFor="file" className="text-right">Resume</Label>
+                                <Label htmlFor="profilePhoto" className="text-right">Photo</Label>
                                 <Input
-                                    id="file"
-                                    name="file"
+                                    id="profilePhoto"
+                                    name="profilePhoto"
                                     type="file"
-                                    accept="application/pdf"
+                                    accept="image/*"
                                     onChange={fileChangeHandler}
                                     className="col-span-3"
                                 />
                             </div>
+                            {
+                                user?.role === 'student' && (
+                                    <div className='grid grid-cols-4 items-center gap-4'>
+                                        <Label htmlFor="resume" className="text-right">Resume</Label>
+                                        <Input
+                                            id="resume"
+                                            name="resume"
+                                            type="file"
+                                            accept="application/pdf"
+                                            onChange={fileChangeHandler}
+                                            className="col-span-3"
+                                        />
+                                    </div>
+                                )
+                            }
                         </div>
                         <DialogFooter>
                             {

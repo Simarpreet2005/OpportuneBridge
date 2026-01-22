@@ -1,128 +1,200 @@
-import { Job } from "../models/job.model.js";
 import { Application } from "../models/application.model.js";
+import { Job } from "../models/job.model.js";
 
-export const applyJob=async(req,res)=>{
-    try{
-    const userId=req.id;
-    const jobId=req.params.id;
-    if(!jobId){
-        return res.status(400).json({
-            message:"Job id is required",
-            success:false
+export const applyJob = async (req, res) => {
+    try {
+        const userId = req.id;
+        const jobId = req.params.id;
+        if (!jobId) {
+            return res.status(400).json({
+                message: "Job id is required.",
+                success: false
+            })
+        };
+
+        const existingApplication = await Application.findOne({ job: jobId, applicant: userId });
+
+        if (existingApplication) {
+            return res.status(400).json({
+                message: "You have already applied for this jobs",
+                success: false
+            });
+        }
+
+        const job = await Job.findById(jobId);
+        if (!job) {
+            return res.status(404).json({
+                message: "Job not found",
+                success: false
+            })
+        }
+
+        const newApplication = await Application.create({
+            job: jobId,
+            applicant: userId,
+        });
+
+        job.applications.push(newApplication._id);
+        await job.save();
+        return res.status(201).json({
+            message: "Job applied successfully.",
+            success: true
         })
+    } catch (error) {
+        console.log(error);
     }
-    // check if the user has already applied for the job
-    const existingApplication=await Application.findOne({job:jobId,applicant:userId})
-    if(existingApplication){
-        return res.status(400).json({
-            message:"You have already applied for this job",
-            success:false
-        })  
-    }
-    // check if the jobs exists
-    const job=await Job.findById(jobId)
-    if(!job){
-        return res.status(404).json({
-            message:"Job not found",
-            success:false
-        })     
-    }
-    // create a new application
-    const newApplication=await Application.create({ 
-        job:jobId,
-        applicant:userId
-    });
-    job.applications.push(newApplication._id);
-    await job.save();
-    return res.status(201).json({
-        message:"Job applied successfully",
-        success:true
-    })
-    }
-   catch(error){
+};
+export const getAppliedJobs = async (req, res) => {
+    try {
+        const userId = req.id;
+        const application = await Application.find({ applicant: userId }).sort({ createdAt: -1 }).populate({
+            path: 'job',
+            options: { sort: { createdAt: -1 } },
+            populate: {
+                path: 'company',
+                options: { sort: { createdAt: -1 } },
+            }
+        });
+        if (!application) {
+            return res.status(404).json({
+                message: "No Applications",
+                success: false
+            })
+        };
+        return res.status(200).json({
+            application,
+            success: true
+        })
+    } catch (error) {
         console.log(error);
     }
 }
-export const getAppliedJobs=async(req,res)=>{
-    try{
-        const userId=req.id;
-        const application=await Application.find({applicant:userId}).populate({
-            path:'job',
-            options:{sort:{createdAt:-1}},
-            populate:{ 
-                 path:'company',
- options:{sort:{createdAt:-1}}
+
+export const getApplicants = async (req, res) => {
+    try {
+        const jobId = req.params.id;
+        const job = await Job.findById(jobId).populate({
+            path: 'applications',
+            options: { sort: { createdAt: -1 } },
+            populate: {
+                path: 'applicant'
             }
         });
-        if(!application){
+        if (!job) {
             return res.status(404).json({
-                message:"No applications found",
-                success:false
+                message: 'Job not found.',
+                success: false
             })
-        }
-        return res.status(200).json({
-            application,
-            success:true
-        })
-    }
-        catch(error){
-            console.log(error); 
-    }
-}
-// for admin to check who applied for a particular job
-export const getApplicants=async(req,res)=>{
-    try{
-        const jobId=req.params.id;
-        const job=await Job.findById(jobId).populate({
-            path:'applications',
-            options:{sort:{createdAt:-1}},
-            populate:{
-                path:'applicant'
-            }
-        });
-        if(!job){
-            return res.status(404).json({
-                message:"Job not found",        
-                success:false
-            })
-        }
+        };
         return res.status(200).json({
             job,
-            success:true
-        })
-    }
-        catch(error){
-            console.log(error); 
+            succees: true
+        });
+    } catch (error) {
+        console.log(error);
     }
 }
-export const updateStatus=async(req,res)=>{
-    try{
-        const {status}=req.body;
-        const applicationId=req.params.id;
-        if(!status){
+export const updateStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        const applicationId = req.params.id;
+        if (!status) {
             return res.status(400).json({
-                message:"Status is required",
-                success:false
+                message: 'status is required',
+                success: false
             })
-        }
-        // find the application by applicantion id
-        const application=await Application.findOne({_id:applicationId})
-        if(!application){
+        };
+
+
+        const application = await Application.findOne({ _id: applicationId });
+        if (!application) {
             return res.status(404).json({
-                message:"Application not found",
-                success:false
+                message: "Application not found.",
+                success: false
             })
-        }
-        // update the status - admin can update the status to accepted or rejected
-        application.status=status.toLowerCase();
+        };
+
+
+        application.status = status.toLowerCase();
         await application.save();
+
         return res.status(200).json({
-            message:"Application status updated successfully",
-            success:true
-        })  
-    }    catch(error){
-            console.log(error); 
+            message: "Status updated successfully.",
+            success: true
+        });
+
+    } catch (error) {
+        console.log(error);
     }
 }
-    
 
+
+export const checkApplicantATS = async (req, res) => {
+    try {
+        const { applicationId } = req.params;
+
+        const application = await Application.findById(applicationId)
+            .populate('applicant')
+            .populate('job');
+
+        if (!application) {
+            return res.status(404).json({
+                message: "Application not found",
+                success: false
+            });
+        }
+
+        const applicant = application.applicant;
+        const job = application.job;
+
+        const { GoogleGenerativeAI } = await import("@google/generative-ai");
+        if (!process.env.GEMINI_API_KEY) {
+            return res.status(400).json({
+                message: "AI service not configured",
+                success: false
+            });
+        }
+
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+
+        const prompt = `Act as an ATS (Applicant Tracking System). Analyze this candidate's profile against the job requirements.
+
+Candidate Profile:
+- Skills: ${applicant.profile.skills?.join(', ') || 'Not specified'}
+- Bio: ${applicant.profile.bio || 'Not specified'}
+
+Job Requirements:
+- Title: ${job.title}
+- Description: ${job.description}
+- Required Skills: ${job.requirements?.join(', ') || 'Not specified'}
+- Experience: ${job.experienceLevel || 'Not specified'} years
+
+Provide:
+1. ATS Score (0-100)
+2. Match Analysis (2-3 sentences)
+3. Missing Skills (list)
+4. Recommendation (Shortlist/Review/Reject)
+
+Return JSON format: { "score": number, "analysis": "string", "missingSkills": ["string"], "recommendation": "string" }
+Return ONLY the JSON.`;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text().replace(/```json|```/g, "").trim();
+        const data = JSON.parse(text);
+
+        return res.status(200).json({
+            ...data,
+            applicantName: applicant.fullname,
+            success: true
+        });
+
+    } catch (error) {
+        console.error("ATS Check Error:", error);
+        return res.status(500).json({
+            message: "Failed to check ATS score",
+            success: false
+        });
+    }
+}

@@ -25,45 +25,48 @@ const PostJob = () => {
         position: 0,
         companyId: ""
     });
-    const [loading, setLoading]= useState(false);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const { companies } = useSelector(store => store.company);
     const changeEventHandler = (e) => {
-        setInput({ ...input, [e.target.name]: e.target.value });
+        const { name, value, type } = e.target;
+        setInput({
+            ...input,
+            [name]: type === 'number' || name === 'salary' ? (value === '' ? '' : Number(value)) : value
+        });
     };
 
     const selectChangeHandler = (value) => {
-        const selectedCompany = companies.find((company)=> company.name.toLowerCase() === value);
-        setInput({...input, companyId:selectedCompany._id});
+        const selectedCompany = companies.find((company) => company.name.toLowerCase() === value);
+        setInput({ ...input, companyId: selectedCompany._id });
     };
 
     const submitHandler = async (e) => {
         e.preventDefault();
         try {
             setLoading(true);
-            const res = await axios.post(`${JOB_API_END_POINT}/post`, input,{
-                headers:{
-                    'Content-Type':'application/json'
+            const res = await axios.post(`${JOB_API_END_POINT}/post`, input, {
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                withCredentials:true
+                withCredentials: true
             });
-            if(res.data.success){
+            if (res.data.success) {
                 toast.success(res.data.message);
                 navigate("/admin/jobs");
             }
         } catch (error) {
-            toast.error(error.response.data.message);
-        } finally{
+            toast.error(error.response?.data?.message || "An error occurred");
+        } finally {
             setLoading(false);
         }
     }
 
     return (
         <div>
-            <Navbar />
-            <div className='flex items-center justify-center w-screen my-5'>
-                <form onSubmit = {submitHandler} className='p-8 max-w-4xl border border-gray-200 shadow-lg rounded-md'>
+            <div className='flex items-center justify-center w-full my-5'>
+                <form onSubmit={submitHandler} className='p-8 max-w-4xl border border-gray-200 shadow-lg rounded-md'>
                     <div className='grid grid-cols-2 gap-2'>
                         <div>
                             <Label>Title</Label>
@@ -136,6 +139,19 @@ const PostJob = () => {
                             />
                         </div>
                         <div>
+                            <Label>Opportunity Type</Label>
+                            <Select onValueChange={(value) => setInput({ ...input, opportunityType: value })}>
+                                <SelectTrigger className="w-full my-1">
+                                    <SelectValue placeholder="Select Opportunity Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Job">Job</SelectItem>
+                                    <SelectItem value="Internship">Internship</SelectItem>
+                                    <SelectItem value="Competition">Competition</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div>
                             <Label>No of Postion</Label>
                             <Input
                                 type="number"
@@ -156,7 +172,7 @@ const PostJob = () => {
                                             {
                                                 companies.map((company) => {
                                                     return (
-                                                        <SelectItem value={company?.name?.toLowerCase()}>{company.name}</SelectItem>
+                                                        <SelectItem key={company?._id} value={company?.name?.toLowerCase()}>{company.name}</SelectItem>
                                                     )
                                                 })
                                             }
@@ -166,7 +182,7 @@ const PostJob = () => {
                                 </Select>
                             )
                         }
-                    </div> 
+                    </div>
                     {
                         loading ? <Button className="w-full my-4"> <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please wait </Button> : <Button type="submit" className="w-full my-4">Post New Job</Button>
                     }

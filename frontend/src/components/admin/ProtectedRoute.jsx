@@ -2,20 +2,20 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-const ProtectedRoute = ({children}) => {
-    const {user} = useSelector(store=>store.auth);
+const ProtectedRoute = ({ children, allowedRoles = ['recruiter', 'superadmin'] }) => {
+    const { user } = useSelector(store => store.auth);
 
     const navigate = useNavigate();
 
-    useEffect(()=>{
-        if(user === null || user.role !== 'recruiter'){
+    useEffect(() => {
+        if (user === null || !allowedRoles.includes(user.role)) {
             navigate("/");
         }
-    },[]);
+    }, []);
 
     return (
         <>
-        {children}
+            {children}
         </>
     )
 };
