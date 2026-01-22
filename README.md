@@ -96,12 +96,6 @@ Open your browser and navigate to `http://localhost:5173` (or the port shown in 
 
 ---
 
-## 📂 Project Structure
-
-For a detailed breakdown of the codebase, check out [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md).
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please fork the repository and submit a pull request.
