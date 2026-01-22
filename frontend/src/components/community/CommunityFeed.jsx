@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { toast } from 'sonner';
-import { Heart, MessageCircle, Image as ImageIcon, Send } from 'lucide-react';
+import { Heart, MessageCircle, Image as ImageIcon, Send, Trash2 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 const CommunityFeed = () => {
@@ -61,7 +61,7 @@ const CommunityFeed = () => {
     const handleLike = async (postId) => {
         try {
             const res = await axios.post(`${POST_API_END_POINT}/${postId}/like`, {}, { withCredentials: true });
-           
+
             setPosts(posts.map(p => {
                 if (p._id === postId) {
                     const isLiked = p.likes.includes(user?._id);
@@ -77,6 +77,21 @@ const CommunityFeed = () => {
         }
     }
 
+    const handleDelete = async (postId) => {
+        if (!window.confirm('Are you sure you want to delete this post?')) return;
+
+        try {
+            const res = await axios.delete(`${POST_API_END_POINT}/${postId}`, { withCredentials: true });
+            if (res.data.success) {
+                toast.success('Post deleted successfully');
+                setPosts(posts.filter(p => p._id !== postId));
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to delete post');
+            console.log(error);
+        }
+    }
+
     const PostItem = ({ post }) => {
         const [showComments, setShowComments] = useState(false);
         const [commentText, setCommentText] = useState("");
@@ -88,7 +103,7 @@ const CommunityFeed = () => {
                 if (res.data.success) {
                     toast.success("Comment added");
                     setCommentText("");
-                  
+
                     fetchPosts();
                 }
             } catch (error) {
@@ -100,15 +115,27 @@ const CommunityFeed = () => {
 
         return (
             <div className='bg-card border border-border rounded-xl p-6 shadow-sm'>
-                <div className='flex items-center gap-3 mb-4'>
-                    <Avatar>
-                        <AvatarImage src={post.author?.profile?.profilePhoto} />
-                        <AvatarFallback>{post.author?.fullname?.[0]}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                        <h4 className='font-bold'>{post.author?.fullname}</h4>
-                        <span className='text-xs text-muted-foreground'>{new Date(post.createdAt).toLocaleDateString()}</span>
+                <div className='flex items-center justify-between mb-4'>
+                    <div className='flex items-center gap-3'>
+                        <Avatar>
+                            <AvatarImage src={post.author?.profile?.profilePhoto} />
+                            <AvatarFallback>{post.author?.fullname?.[0]}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                            <h4 className='font-bold'>{post.author?.fullname}</h4>
+                            <span className='text-xs text-muted-foreground'>{new Date(post.createdAt).toLocaleDateString()}</span>
+                        </div>
                     </div>
+                    {post.author?._id === user?._id && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(post._id)}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        >
+                            <Trash2 className='w-4 h-4' />
+                        </Button>
+                    )}
                 </div>
                 <p className='text-foreground/90 whitespace-pre-wrap mb-4'>{post.content}</p>
                 {post.image && (

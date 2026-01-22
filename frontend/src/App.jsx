@@ -36,6 +36,7 @@ import ProtectedRoute from "./components/admin/ProtectedRoute"
 import SuperAdminDashboard from "./components/admin/SuperAdminDashboard"
 import SuperAdminUsers from "./components/admin/SuperAdminUsers"
 import SuperAdminAnalytics from "./components/admin/SuperAdminAnalytics"
+import CreateChallenge from "./components/admin/CreateChallenge"
 
 import Chatbot from "./components/Chatbot"
 import Dashboard from "./pages/Dashboard"
@@ -146,6 +147,14 @@ const appRouter = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Applicants />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "/admin/challenges/create",
+        element: (
+          <ProtectedRoute>
+            <CreateChallenge />
           </ProtectedRoute>
         )
       },

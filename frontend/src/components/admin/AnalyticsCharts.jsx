@@ -184,7 +184,7 @@ export const ApplicantFunnelChart = ({ data }) => {
     }
 
     const funnelData = [
-        { stage: 'Applied', count: data.applied, percentage: 100 },
+        { stage: 'Applied', count: data.applied, percentage: data.applied > 0 ? 100 : 0 },
         { stage: 'Reviewed', count: data.reviewed, percentage: data.applied > 0 ? (data.reviewed / data.applied * 100).toFixed(1) : 0 },
         { stage: 'Accepted', count: data.accepted, percentage: data.applied > 0 ? (data.accepted / data.applied * 100).toFixed(1) : 0 }
     ];

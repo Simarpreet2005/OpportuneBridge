@@ -49,12 +49,14 @@ const Navbar = () => {
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/superadmin/dashboard">Dashboard</Link></li>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/superadmin/users">Users</Link></li>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/superadmin/analytics">Analytics</Link></li>
+                                    <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/admin/challenges/create">Post Challenge</Link></li>
                                 </>
                             ) : user && user.role === 'recruiter' ? (
                                 <>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/admin/dashboard">Dashboard</Link></li>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/admin/companies">Companies</Link></li>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/admin/jobs">Jobs</Link></li>
+                                    <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/admin/challenges/create">Post Challenge</Link></li>
                                 </>
                             ) : (
                                 <>

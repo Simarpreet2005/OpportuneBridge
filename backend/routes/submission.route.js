@@ -1,10 +1,11 @@
 import express from "express";
-import { submitCode, getMySubmissions } from "../controllers/submission.controller.js";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
+import { getAllUserSubmissions, getSubmissionsForChallenge, submitCode } from "../controllers/submission.controller.js";
 
 const router = express.Router();
 
-router.route("/submit").post(isAuthenticated, submitCode);
-router.route("/history/:challengeId").get(isAuthenticated, getMySubmissions);
+router.route("/").post(isAuthenticated, submitCode);
+router.route("/").get(isAuthenticated, getAllUserSubmissions);
+router.route("/challenge/:challengeId").get(isAuthenticated, getSubmissionsForChallenge);
 
 export default router;

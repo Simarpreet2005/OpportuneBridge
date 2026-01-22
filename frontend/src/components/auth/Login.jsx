@@ -57,7 +57,7 @@ const Login = () => {
             dispatch(setLoading(false));
         }
     }
-  
+
     const googleLoginHandler = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
             try {
@@ -93,7 +93,7 @@ const Login = () => {
                             value={input.email}
                             name="email"
                             onChange={changeEventHandler}
-                            placeholder="patel@gmail.com"
+                            placeholder="example@gmail.com"
                         />
                     </div>
 

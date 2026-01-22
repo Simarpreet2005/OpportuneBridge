@@ -116,3 +116,169 @@ export const getAllJobs = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 };
+
+export const deleteCompany = async (req, res) => {
+    try {
+        const { companyId } = req.params;
+
+        const company = await Company.findById(companyId);
+        if (!company) {
+            return res.status(404).json({ message: "Company not found", success: false });
+        }
+
+        // Delete all jobs associated with this company
+        await Job.deleteMany({ company: companyId });
+
+        // Delete the company
+        await Company.findByIdAndDelete(companyId);
+
+        return res.status(200).json({
+            message: "Company and associated jobs deleted successfully",
+            success: true
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
+
+export const deleteJob = async (req, res) => {
+    try {
+        const { jobId } = req.params;
+
+        const job = await Job.findById(jobId);
+        if (!job) {
+            return res.status(404).json({ message: "Job not found", success: false });
+        }
+
+        // Delete all applications for this job
+        await Application.deleteMany({ job: jobId });
+
+        // Delete the job
+        await Job.findByIdAndDelete(jobId);
+
+        return res.status(200).json({
+            message: "Job and associated applications deleted successfully",
+            success: true
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
+
+export const deletePost = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const { Post } = await import("../models/post.model.js");
+
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: "Post not found", success: false });
+        }
+
+        await Post.findByIdAndDelete(postId);
+
+        return res.status(200).json({
+            message: "Post deleted successfully",
+            success: true
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
+
+export const suspendUser = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { suspend } = req.body; // true to suspend, false to unsuspend
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found", success: false });
+        }
+
+        if (user.role === 'superadmin') {
+            return res.status(403).json({ message: "Cannot suspend super admin", success: false });
+        }
+
+        user.isSuspended = suspend;
+        await user.save();
+
+        return res.status(200).json({
+            message: suspend ? "User suspended successfully" : "User unsuspended successfully",
+            success: true
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
+
+export const getAllApplications = async (req, res) => {
+    try {
+        const applications = await Application.find()
+            .populate('applicant', 'fullname email')
+            .populate('job', 'title')
+            .populate({
+                path: 'job',
+                populate: {
+                    path: 'company',
+                    select: 'name'
+                }
+            })
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            applications,
+            success: true
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
+
+export const deleteApplication = async (req, res) => {
+    try {
+        const { applicationId } = req.params;
+
+        const application = await Application.findById(applicationId);
+        if (!application) {
+            return res.status(404).json({ message: "Application not found", success: false });
+        }
+
+        await Application.findByIdAndDelete(applicationId);
+
+        return res.status(200).json({
+            message: "Application deleted successfully",
+            success: true
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
+
+export const deleteChallenge = async (req, res) => {
+    try {
+        const { challengeId } = req.params;
+        const { Challenge } = await import("../models/challenge.model.js");
+
+        const challenge = await Challenge.findById(challengeId);
+        if (!challenge) {
+            return res.status(404).json({ message: "Challenge not found", success: false });
+        }
+
+        await Challenge.findByIdAndDelete(challengeId);
+
+        return res.status(200).json({
+            message: "Challenge deleted successfully",
+            success: true
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};

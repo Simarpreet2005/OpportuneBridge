@@ -102,3 +102,30 @@ export const addComment = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
+
+export const deletePost = async (req, res) => {
+    try {
+        const userId = req.id;
+        const postId = req.params.postId;
+
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: "Post not found", success: false });
+        }
+
+        // Check if the user is the author of the post
+        if (post.author.toString() !== userId) {
+            return res.status(403).json({ message: "You are not authorized to delete this post", success: false });
+        }
+
+        await Post.findByIdAndDelete(postId);
+
+        return res.status(200).json({
+            message: "Post deleted successfully",
+            success: true
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+}

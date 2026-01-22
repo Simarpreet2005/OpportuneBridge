@@ -3,7 +3,7 @@ import { Badge } from '../ui/badge'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
-import { MoreHorizontal, Award } from 'lucide-react';
+import { MoreHorizontal, Award, Download } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import { APPLICATION_API_END_POINT } from '@/utils/constant';
@@ -47,6 +47,26 @@ const ApplicantsTable = () => {
         }
     }
 
+    const downloadResume = async (resumeUrl, fileName) => {
+        try {
+            toast.info('Downloading resume...');
+            const response = await fetch(resumeUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName || 'resume.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            toast.success('Resume downloaded successfully');
+        } catch (error) {
+            toast.error('Failed to download resume');
+            console.error(error);
+        }
+    }
+
     return (
         <div>
             <Table>
@@ -70,9 +90,20 @@ const ApplicantsTable = () => {
                                     <TableCell>{item?.applicant?.fullname}</TableCell>
                                     <TableCell>{item?.applicant?.email}</TableCell>
                                     <TableCell>{item?.applicant?.phoneNumber}</TableCell>
-                                    <TableCell >
+                                    <TableCell>
                                         {
-                                            item.applicant?.profile?.resume ? <a className="text-blue-600 cursor-pointer" href={item?.applicant?.profile?.resume} target="_blank" rel="noopener noreferrer">{item?.applicant?.profile?.resumeOriginalName}</a> : <span>NA</span>
+                                            item.applicant?.profile?.resume ? (
+                                                <button
+                                                    onClick={() => downloadResume(
+                                                        item?.applicant?.profile?.resume,
+                                                        item?.applicant?.profile?.resumeOriginalName || 'resume.pdf'
+                                                    )}
+                                                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 cursor-pointer hover:underline"
+                                                >
+                                                    <Download className="h-4 w-4" />
+                                                    <span>{item?.applicant?.profile?.resumeOriginalName || 'Download'}</span>
+                                                </button>
+                                            ) : <span>NA</span>
                                         }
                                     </TableCell>
                                     <TableCell>{item?.applicant.createdAt.split("T")[0]}</TableCell>
@@ -122,7 +153,7 @@ const ApplicantsTable = () => {
                         <DialogTitle className="text-2xl font-bold flex items-center gap-2">
                             ATS Analysis - {atsResult?.applicantName}
                             <Badge className={`text-lg ${atsResult?.score >= 80 ? 'bg-green-500' :
-                                    atsResult?.score >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                                atsResult?.score >= 60 ? 'bg-yellow-500' : 'bg-red-500'
                                 }`}>
                                 {atsResult?.score}/100
                             </Badge>
@@ -147,7 +178,7 @@ const ApplicantsTable = () => {
                             <div>
                                 <h4 className="font-bold mb-2">Recommendation</h4>
                                 <Badge className={`${atsResult.recommendation === 'Shortlist' ? 'bg-green-500' :
-                                        atsResult.recommendation === 'Review' ? 'bg-yellow-500' : 'bg-red-500'
+                                    atsResult.recommendation === 'Review' ? 'bg-yellow-500' : 'bg-red-500'
                                     }`}>
                                     {atsResult.recommendation}
                                 </Badge>
