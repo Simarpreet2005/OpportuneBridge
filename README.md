@@ -97,9 +97,14 @@ To create the super admin account, run the seed script:
 cd backend
 node seedSuperAdmin.js
 ```
+fixed credentials: 
+
+⦁	Email: admin@opportunebridge.com
+⦁	Password: Admin@123
 
 ### 6. Access the App
 Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal).
+Live Link: https://opportunebridge-frontend.onrender.com
 
 ---
 
