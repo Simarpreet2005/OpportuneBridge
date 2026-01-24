@@ -31,7 +31,7 @@ console.log("Startup Check - GEMINI_API_KEY:", process.env.GEMINI_API_KEY ? "Loa
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173", "https://opportunebridge-frontend.onrender.com"],
     methods: ["GET", "POST"],
     credentials: true,
   }
@@ -92,7 +92,7 @@ app.use(cookieParser());
 app.use('/uploads', express.static('uploads'));
 
 const corsOptions = {
-  origin: ["http://localhost:5173"],
+  origin: ["http://localhost:5173", "https://opportunebridge-frontend.onrender.com"],
   credentials: true,
 };
 app.use(cors(corsOptions));
