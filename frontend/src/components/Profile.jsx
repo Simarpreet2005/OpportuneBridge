@@ -24,7 +24,13 @@ const Profile = () => {
                 <div className='flex justify-between'>
                     <div className='flex items-center gap-4'>
                         <Avatar className="h-24 w-24">
-                            <AvatarImage src={user?.profile?.profilePhoto || "https://github.com/shadcn.png"} alt="profile" />
+                            {user?.profile?.profilePhoto ? (
+                                <AvatarImage src={user.profile.profilePhoto} alt="profile" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground font-bold text-3xl">
+                                    {user?.fullname?.charAt(0).toUpperCase()}
+                                </div>
+                            )}
                         </Avatar>
                         <div>
                             <h1 className='font-medium text-xl'>{user?.fullname}</h1>
@@ -71,7 +77,7 @@ const Profile = () => {
             {user?.role === 'student' && (
                 <div className='max-w-4xl mx-auto bg-white rounded-2xl'>
                     <h1 className='font-bold text-lg my-5'>Applied Jobs</h1>
-                  
+
                     <AppliedJobTable />
                 </div>
             )}

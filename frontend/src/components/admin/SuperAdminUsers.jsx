@@ -47,7 +47,7 @@ const SuperAdminUsers = () => {
             const res = await axios.delete(`${SUPERADMIN_API_END_POINT}/users/${userId}`, { withCredentials: true });
             if (res.data.success) {
                 toast.success(res.data.message);
-                fetchUsers(); // Refresh the list
+                fetchUsers(); 
             }
         } catch (error) {
             console.log(error);
@@ -68,7 +68,7 @@ const SuperAdminUsers = () => {
             );
             if (res.data.success) {
                 toast.success(res.data.message);
-                fetchUsers(); // Refresh the list
+                fetchUsers(); 
             }
         } catch (error) {
             console.log(error);
@@ -158,7 +158,7 @@ const SuperAdminUsers = () => {
                 </Table>
             </div>
 
-            {/* Delete Confirmation Dialog */}
+            
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>

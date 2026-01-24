@@ -351,48 +351,67 @@ export const checkATSScore = async (req, res) => {
 export const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
-        const user = await User.findOne({ email });
 
-        if (!user) {
-            return res.status(404).json({ message: "User not found", success: false });
+        // Check if email configuration exists
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            console.error("Email configuration missing: EMAIL_USER or EMAIL_PASS not set");
+            return res.status(500).json({
+                message: "Email service is not configured. Please contact the administrator.",
+                success: false
+            });
         }
 
-        const resetToken = crypto.randomBytes(20).toString('hex');
-        user.resetPasswordToken = resetToken;
-        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+        const user = await User.findOne({ email });
 
+        // Always return generic response for security
+        if (!user) {
+            return res.status(200).json({
+                message: "If an account exists, a reset email has been sent.",
+                success: true
+            });
+        }
+
+        // Generate token
+        const resetToken = crypto.randomBytes(32).toString("hex");
+
+        // Hash token before saving
+        const hashedToken = crypto
+            .createHash("sha256")
+            .update(resetToken)
+            .digest("hex");
+
+        user.resetPasswordToken = hashedToken;
+        user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 min
         await user.save();
 
+        const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            service: "gmail",
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
             }
         });
 
-        const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
-
-        const mailOptions = {
+        await transporter.sendMail({
             to: user.email,
             from: process.env.EMAIL_USER,
-            subject: 'OpportuneBridge Password Reset',
-            text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
-                `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
-                `${resetUrl}\n\n` +
-                `If you did not request this, please ignore this email and your password will remain unchanged.\n`
-        };
-
-        await transporter.sendMail(mailOptions);
+            subject: "OpportuneBridge Password Reset",
+            text: `Reset your password:\n\n${resetUrl}\n\nThis link expires in 15 minutes.`
+        });
 
         return res.status(200).json({
-            message: "Reset email sent successfully.",
+            message: "If an account exists, a reset email has been sent.",
             success: true
         });
 
     } catch (error) {
         console.error("Forgot Password Error:", error);
-        return res.status(500).json({ message: "Internal Server Error", success: false });
+        return res.status(500).json({
+            message: "Failed to send reset email. Please try again later.",
+            success: false
+        });
     }
 }
 
@@ -401,24 +420,39 @@ export const resetPassword = async (req, res) => {
         const { token } = req.params;
         const { password } = req.body;
 
+        if (!password || password.length < 8) {
+            return res.status(400).json({
+                message: "Password must be at least 8 characters long",
+                success: false
+            });
+        }
+
+        // Hash incoming token
+        const hashedToken = crypto
+            .createHash("sha256")
+            .update(token)
+            .digest("hex");
+
         const user = await User.findOne({
-            resetPasswordToken: token,
+            resetPasswordToken: hashedToken,
             resetPasswordExpires: { $gt: Date.now() }
         });
 
         if (!user) {
-            return res.status(400).json({ message: "Password reset token is invalid or has expired.", success: false });
+            return res.status(400).json({
+                message: "Token is invalid or expired",
+                success: false
+            });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        user.password = hashedPassword;
+        user.password = await bcrypt.hash(password, 10);
         user.resetPasswordToken = undefined;
         user.resetPasswordExpires = undefined;
 
         await user.save();
 
         return res.status(200).json({
-            message: "Password reset successfully.",
+            message: "Password reset successful. Please log in.",
             success: true
         });
 

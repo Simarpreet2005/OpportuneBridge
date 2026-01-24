@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import Navbar from '../shared/Navbar'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
@@ -44,7 +43,6 @@ const ResetPassword = () => {
 
     return (
         <div>
-            <Navbar />
             <div className='flex items-center justify-center max-w-7xl mx-auto'>
                 <form onSubmit={submitHandler} className='w-full max-w-md border border-gray-200 rounded-md p-4 my-10 bg-white/90 backdrop-blur-xl shadow-2xl '>
                     <h1 className='font-bold text-2xl mb-5 text-center'>Reset Password</h1>

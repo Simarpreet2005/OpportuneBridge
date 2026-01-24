@@ -43,8 +43,8 @@ const userSchema = new mongoose.Schema({
     savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
     isVerifiedSkill: { type: Boolean, default: false }, // AI-verified skills
     resumes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Resume' }],
-    resetPasswordToken: String,
-    resetPasswordExpires: Date
   },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date
 }, { timestamps: true });
 export const User = mongoose.model('User', userSchema);

@@ -81,14 +81,26 @@ const Navbar = () => {
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Avatar className="cursor-pointer border border-border transition-transform hover:scale-105">
-                                        <AvatarImage src={user?.profile?.profilePhoto || "https://github.com/shadcn.png"} alt="@user" />
+                                        {user?.profile?.profilePhoto ? (
+                                            <AvatarImage src={user.profile.profilePhoto} alt="@user" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground font-semibold">
+                                                {user?.fullname?.charAt(0).toUpperCase()}
+                                            </div>
+                                        )}
                                     </Avatar>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80 border-border bg-card shadow-xl rounded-xl mr-4">
                                     <div className=''>
                                         <div className='flex gap-3 space-y-2 items-center mb-4'>
                                             <Avatar className="cursor-pointer border border-border w-10 h-10">
-                                                <AvatarImage src={user?.profile?.profilePhoto || "https://github.com/shadcn.png"} alt="@user" />
+                                                {user?.profile?.profilePhoto ? (
+                                                    <AvatarImage src={user.profile.profilePhoto} alt="@user" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground font-semibold text-xs">
+                                                        {user?.fullname?.charAt(0).toUpperCase()}
+                                                    </div>
+                                                )}
                                             </Avatar>
                                             <div>
                                                 <h4 className='font-bold text-lg leading-none'>{user?.fullname}</h4>
@@ -160,7 +172,13 @@ const Navbar = () => {
                             <div className='flex flex-col gap-3 mt-4'>
                                 <div className='flex items-center gap-3 mb-2'>
                                     <Avatar className="w-8 h-8">
-                                        <AvatarImage src={user?.profile?.profilePhoto} alt="@user" />
+                                        {user?.profile?.profilePhoto ? (
+                                            <AvatarImage src={user.profile.profilePhoto} alt="@user" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground font-semibold text-xs">
+                                                {user?.fullname?.charAt(0).toUpperCase()}
+                                            </div>
+                                        )}
                                     </Avatar>
                                     <span className='font-bold'>{user?.fullname}</span>
                                 </div>

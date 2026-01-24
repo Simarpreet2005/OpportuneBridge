@@ -5,7 +5,7 @@ import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import axios from 'axios';
-import { CHALLENGE_API_END_POINT } from '@/utils/constant'; // You might need to add this constant or use specific URL
+import { CHALLENGE_API_END_POINT } from '@/utils/constant'; 
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Plus, X } from 'lucide-react';
@@ -67,7 +67,6 @@ const CreateChallenge = () => {
                 testCases
             };
 
-            // Assuming URL constant, replace with direct string if constant not available yet
             const res = await axios.post(`http://localhost:8000/api/v1/challenge`, payload, {
                 headers: {
                     'Content-Type': 'application/json'
@@ -198,7 +197,6 @@ const CreateChallenge = () => {
                                         />
                                     </div>
                                     <div className="flex items-center gap-2 mt-1 md:mt-0">
-                                        {/* Hidden toggle if needed, or just remove buttn */}
                                         <Button type="button" variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => removeTestCase(index)}>
                                             <X className="w-4 h-4" />
                                         </Button>
