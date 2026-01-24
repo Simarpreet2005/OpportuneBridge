@@ -10,7 +10,7 @@ const Leaderboard = () => {
     useEffect(() => {
         const fetchLeaderboard = async () => {
             try {
-                const res = await axios.get("http://localhost:8000/api/v1/user/leaderboard");
+                const res = await axios.get("https://opportunebridge-backend.onrender.com/api/v1/user/leaderboard");
                 if (res.data.success) {
                     setUsers(res.data.leaderboard);
                 }

@@ -17,7 +17,7 @@ const ResumeList = () => {
     useEffect(() => {
         const fetchResumes = async () => {
             try {
-                const res = await axios.get('http://localhost:8000/api/v1/resume/get', { withCredentials: true });
+                const res = await axios.get('https://opportunebridge-backend.onrender.com/api/v1/resume/get', { withCredentials: true });
                 if (res.data.success) {
                     dispatch(setResumes(res.data.resumes));
                 }
@@ -30,7 +30,7 @@ const ResumeList = () => {
 
     const deleteResume = async (id) => {
         try {
-            const res = await axios.delete(`http://localhost:8000/api/v1/resume/delete/${id}`, { withCredentials: true });
+            const res = await axios.delete(`https://opportunebridge-backend.onrender.com/api/v1/resume/delete/${id}`, { withCredentials: true });
             if (res.data.success) {
                 toast.success(res.data.message);
                 dispatch(setResumes(resumes.filter(r => r._id !== id)));
@@ -67,7 +67,7 @@ const ResumeList = () => {
                         {resumes.map((resume) => (
                             <div key={resume._id} className='group bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300'>
                                 <div className='h-48 bg-gray-100/50 rounded-2xl mb-6 flex items-center justify-center group-hover:bg-primary/5 transition-colors overflow-hidden relative'>
-                                    
+
                                     <div className='w-32 h-40 bg-white shadow-md rounded-md p-4 space-y-2 transform group-hover:scale-105 transition-transform'>
                                         <div className='w-full h-2 bg-gray-200 rounded-full' />
                                         <div className='w-2/3 h-2 bg-gray-100 rounded-full' />

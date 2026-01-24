@@ -5,7 +5,7 @@ import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import axios from 'axios';
-import { CHALLENGE_API_END_POINT } from '@/utils/constant'; 
+import { CHALLENGE_API_END_POINT } from '@/utils/constant';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Plus, X } from 'lucide-react';
@@ -67,7 +67,7 @@ const CreateChallenge = () => {
                 testCases
             };
 
-            const res = await axios.post(`http://localhost:8000/api/v1/challenge`, payload, {
+            const res = await axios.post(`https://opportunebridge-backend.onrender.com/api/v1/challenge`, payload, {
                 headers: {
                     'Content-Type': 'application/json'
                 },

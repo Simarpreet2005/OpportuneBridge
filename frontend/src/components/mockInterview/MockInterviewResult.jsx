@@ -15,7 +15,7 @@ const MockInterviewResult = () => {
     useEffect(() => {
         const fetchResult = async () => {
             try {
-                const res = await axios.get(`http://localhost:8000/api/v1/mockinterview/get/${id}`, { withCredentials: true });
+                const res = await axios.get(`https://opportunebridge-backend.onrender.com/api/v1/mockinterview/get/${id}`, { withCredentials: true });
                 if (res.data.success) {
                     setInterview(res.data.interview);
                 }

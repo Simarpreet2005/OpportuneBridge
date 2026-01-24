@@ -3,7 +3,7 @@ import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
 import { Zap, Code, Loader2 } from 'lucide-react';
-import useGetMatchScore from '@/hooks/useGetMatchScore';
+import useGetMatchScore from '@/Hooks/useGetMatchScore';
 import { useNavigate } from 'react-router-dom';
 
 const ChallengeCard = ({

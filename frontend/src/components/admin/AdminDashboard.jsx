@@ -5,9 +5,9 @@ import { Badge } from '../ui/badge'
 import { Briefcase, Building, Users, Plus, ArrowRight, TrendingUp, Clock, Target, Loader2, Calendar, Award } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import useGetAllAdminJobs from '@/hooks/useGetAllAdminJobs'
-import useGetAllCompanies from '@/hooks/useGetAllCompanies'
-import useAnalytics from '@/hooks/useAnalytics'
+import useGetAllAdminJobs from '@/Hooks/useGetAllAdminJobs'
+import useGetAllCompanies from '@/Hooks/useGetAllCompanies'
+import useAnalytics from '@/Hooks/useAnalytics'
 import { ApplicationsLineChart, StatusDonutChart, TopJobsBarChart, ApplicantFunnelChart } from './AnalyticsCharts'
 
 const AdminDashboard = () => {
@@ -173,8 +173,8 @@ const AdminDashboard = () => {
                                         </div>
                                         <div className='flex items-center gap-4'>
                                             <Badge className={`${activity.status === 'accepted' ? 'bg-green-100 text-green-700' :
-                                                    activity.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                                                        'bg-yellow-100 text-yellow-700'
+                                                activity.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                                                    'bg-yellow-100 text-yellow-700'
                                                 }`}>
                                                 {activity.status}
                                             </Badge>

@@ -37,7 +37,7 @@ const ResumeBuilder = () => {
         if (id) {
             const fetchResume = async () => {
                 try {
-                    const res = await axios.get(`http://localhost:8000/api/v1/resume/get/${id}`, { withCredentials: true });
+                    const res = await axios.get(`https://opportunebridge-backend.onrender.com/api/v1/resume/get/${id}`, { withCredentials: true });
                     if (res.data.success) {
                         setData(res.data.resume);
                     }
@@ -78,7 +78,7 @@ const ResumeBuilder = () => {
         try {
             setAiLoading(true);
             const content = field ? data[section][index][field] : data.personalInfo.summary;
-            const res = await axios.post('http://localhost:8000/api/v1/resume/optimize', {
+            const res = await axios.post('https://opportunebridge-backend.onrender.com/api/v1/resume/optimize', {
                 section,
                 content
             }, { withCredentials: true });
@@ -103,7 +103,7 @@ const ResumeBuilder = () => {
     const saveResume = async () => {
         try {
             setLoading(true);
-            const url = id ? `http://localhost:8000/api/v1/resume/update/${id}` : 'http://localhost:8000/api/v1/resume/create';
+            const url = id ? `https://opportunebridge-backend.onrender.com/api/v1/resume/update/${id}` : 'https://opportunebridge-backend.onrender.com/api/v1/resume/create';
             const method = id ? 'put' : 'post';
 
             const res = await axios[method](url, data, { withCredentials: true });
@@ -121,7 +121,7 @@ const ResumeBuilder = () => {
     const checkATS = async () => {
         try {
             setAiLoading(true);
-            const res = await axios.post('http://localhost:8000/api/v1/resume/ats-score', { resumeData: data }, { withCredentials: true });
+            const res = await axios.post('https://opportunebridge-backend.onrender.com/api/v1/resume/ats-score', { resumeData: data }, { withCredentials: true });
             if (res.data.success) {
                 setAtsResult(res.data);
                 setAtsOpen(true);

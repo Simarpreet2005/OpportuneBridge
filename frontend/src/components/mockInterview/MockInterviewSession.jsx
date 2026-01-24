@@ -20,7 +20,7 @@ const MockInterviewSession = () => {
         const fetchInterview = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get(`http://localhost:8000/api/v1/mockinterview/get/${id}`, { withCredentials: true });
+                const res = await axios.get(`https://opportunebridge-backend.onrender.com/api/v1/mockinterview/get/${id}`, { withCredentials: true });
                 if (res.data.success) {
                     setInterview(res.data.interview);
                 }
@@ -45,7 +45,7 @@ const MockInterviewSession = () => {
                 answer: answers[idx]
             }));
 
-            const res = await axios.post('http://localhost:8000/api/v1/mockinterview/submit', {
+            const res = await axios.post('https://opportunebridge-backend.onrender.com/api/v1/mockinterview/submit', {
                 interviewId: id,
                 answers: formattedAnswers
             }, { withCredentials: true });

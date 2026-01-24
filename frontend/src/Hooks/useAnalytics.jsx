@@ -13,7 +13,7 @@ const useAnalytics = (timeRange = 'all') => {
                 setLoading(true);
                 setError(null);
                 const res = await axios.get(
-                    `http://localhost:8000/api/v1/analytics/recruiter?timeRange=${timeRange}`,
+                    `https://opportunebridge-backend.onrender.com/api/v1/analytics/recruiter?timeRange=${timeRange}`,
                     { withCredentials: true }
                 );
 

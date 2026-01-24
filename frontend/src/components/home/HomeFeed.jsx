@@ -4,7 +4,7 @@ import Leaderboard from '../shared/Leaderboard';
 import { Button } from '../ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import useGetAllChallenges from '@/hooks/useGetAllChallenges';
+import useGetAllChallenges from '@/Hooks/useGetAllChallenges';
 
 const HomeFeed = () => {
     useGetAllChallenges();
@@ -18,7 +18,7 @@ const HomeFeed = () => {
                     <Button variant="ghost" className='text-primary hover:text-primary/80'>View All <ArrowRight className='w-4 h-4 ml-2' /></Button>
                 </div>
 
-              
+
                 <div className='columns-1 md:columns-2 gap-6 space-y-6'>
                     {challenges && challenges.length > 0 ? (
                         challenges.map((item, index) => (
@@ -29,7 +29,7 @@ const HomeFeed = () => {
                                 difficulty={item.difficulty}
                                 techStack={item.techStack}
                                 participants={item.participants?.length || 0}
-                                image={item.image || "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=2070&auto=format&fit=crop"} 
+                                image={item.image || "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=2070&auto=format&fit=crop"}
                             />
                         ))
                     ) : (

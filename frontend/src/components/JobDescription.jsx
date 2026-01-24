@@ -50,7 +50,7 @@ const JobDescription = () => {
         }
         const fetchAiScore = async () => {
             try {
-                const res = await axios.post(`http://localhost:8000/api/v1/ai/score`, { targetId: jobId, targetType: 'Job' }, { withCredentials: true });
+                const res = await axios.post(`https://opportunebridge-backend.onrender.com/api/v1/ai/score`, { targetId: jobId, targetType: 'Job' }, { withCredentials: true });
                 if (res.data.success) {
                     setAiScore(res.data); // Store entire response { score, analysis }
                 }
@@ -99,8 +99,8 @@ const JobDescription = () => {
                     </div>
                     <Button variant="outline" size="sm" onClick={async () => {
                         try {
-                            const res = await axios.post(`http://localhost:8000/api/v1/aichat/ats`, {
-                                resumeText: user.profile.skills.join(", "), 
+                            const res = await axios.post(`https://opportunebridge-backend.onrender.com/api/v1/aichat/ats`, {
+                                resumeText: user.profile.skills.join(", "),
                                 jobDescription: singleJob.description
                             }, { withCredentials: true });
                             if (res.data.success) {

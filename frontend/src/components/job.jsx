@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import { Avatar, AvatarImage } from './ui/avatar'
 import { Badge } from './ui/badge'
 import { useNavigate } from 'react-router-dom'
-import useGetMatchScore from '@/hooks/useGetMatchScore'
+import useGetMatchScore from '@/Hooks/useGetMatchScore'
 
 const Job = ({ job }) => {
     const { user } = useSelector(store => store.auth);

@@ -12,7 +12,7 @@ const useGetMatchScore = (targetId, targetType = 'Challenge') => {
 
             setLoading(true);
             try {
-                const res = await axios.post("http://localhost:8000/api/v1/ai/score",
+                const res = await axios.post("https://opportunebridge-backend.onrender.com/api/v1/ai/score",
                     { targetId, targetType },
                     { withCredentials: true }
                 );

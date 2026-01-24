@@ -5,7 +5,7 @@ import Job from './job';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 
-import useGetAllJobs from '@/hooks/useGetAllJobs';
+import useGetAllJobs from '@/Hooks/useGetAllJobs';
 
 
 const Jobs = () => {

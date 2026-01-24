@@ -31,7 +31,7 @@ const Chatbot = () => {
 
         try {
             const historyToSend = chatHistory.slice(1).map(item => ({ role: item.role, parts: item.parts }));
-            const res = await axios.post(`http://localhost:8000/api/v1/aichat/chat`, {
+            const res = await axios.post(`https://opportunebridge-backend.onrender.com/api/v1/aichat/chat`, {
                 message,
                 history: historyToSend
             }, { withCredentials: true });
