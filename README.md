@@ -98,9 +98,6 @@ cd backend
 node seedSuperAdmin.js
 ```
 
-> [!IMPORTANT]
-> For security reasons, change the default super admin password after first login. The default credentials are set in `backend/seedSuperAdmin.js` and should **never** be committed to a public repository.
-
 ### 6. Access the App
 Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal).
 
