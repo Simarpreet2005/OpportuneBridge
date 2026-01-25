@@ -24,11 +24,11 @@ const submissionSchema = new mongoose.Schema({
         enum: ['Pending', 'Passed', 'Failed'],
         default: 'Pending'
     },
-    executionTime: { type: Number }, // in ms
-    memoryUsage: { type: Number }, // in KB
+    executionTime: { type: Number }, 
+    memoryUsage: { type: Number }, 
     aiFeedback: {
         type: String,
-        default: "" // Feedback on code quality/optimizations from AI
+        default: "" 
     }
 }, { timestamps: true });
 

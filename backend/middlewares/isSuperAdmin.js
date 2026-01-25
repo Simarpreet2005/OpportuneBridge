@@ -18,7 +18,7 @@ const isSuperAdmin = async (req, res, next) => {
         };
         req.id = decode.userId;
 
-        // Check if user is superadmin
+  
         const { User } = await import("../models/user.model.js");
         const user = await User.findById(req.id);
 

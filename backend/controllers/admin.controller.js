@@ -11,8 +11,6 @@ export const getSystemStats = async (req, res) => {
         const totalJobs = await Job.countDocuments();
         const totalCompanies = await Company.countDocuments();
         const totalApplications = await Application.countDocuments();
-
-        // Recent Activity
         const recentUsers = await User.find().sort({ createdAt: -1 }).limit(5).select('fullname email role createdAt');
         const recentJobs = await Job.find().sort({ createdAt: -1 }).limit(5).select('title company createdAt').populate('company', 'name');
 

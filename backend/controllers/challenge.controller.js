@@ -1,6 +1,6 @@
 import { Challenge } from "../models/challenge.model.js";
 
-// Admin: Create a new challenge
+
 export const createChallenge = async (req, res) => {
     try {
         const { title, description, difficulty, techStack, boilerplateCode, testCases } = req.body;
@@ -35,7 +35,6 @@ export const createChallenge = async (req, res) => {
     }
 }
 
-// Public: Get all challenges
 export const getChallenges = async (req, res) => {
     try {
         const challenges = await Challenge.find({}).sort({ createdAt: -1 });
@@ -52,7 +51,7 @@ export const getChallenges = async (req, res) => {
     }
 }
 
-// Public/Auth: Get single challenge
+
 export const getChallengeById = async (req, res) => {
     try {
         const challengeId = req.params.id;

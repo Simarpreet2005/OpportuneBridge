@@ -467,8 +467,10 @@ export const googleLogin = async (req, res) => {
         const { googleToken, role } = req.body;
 
         // Using fetch to get user info from Google UserInfo endpoint
+        console.log("Fetching Google user info with token...");
         const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${googleToken}`);
         const payload = await response.json();
+        console.log("Google payload received:", payload?.email ? "Success for " + payload.email : "Failed");
 
         if (!payload || !payload.email) {
             return res.status(400).json({ message: "Invalid Google Token", success: false });

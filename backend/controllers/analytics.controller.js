@@ -6,9 +6,8 @@ import { User } from "../models/user.model.js";
 export const getRecruiterAnalytics = async (req, res) => {
     try {
         const recruiterId = req.id;
-        const { timeRange = 'all' } = req.query; // 7d, 30d, 90d, all
-
-        // Calculate date filter
+        const { timeRange = 'all' } = req.query; 
+       
         let dateFilter = {};
         if (timeRange !== 'all') {
             const days = parseInt(timeRange);
@@ -17,32 +16,27 @@ export const getRecruiterAnalytics = async (req, res) => {
             dateFilter = { createdAt: { $gte: startDate } };
         }
 
-        // Get all jobs created by this recruiter
         const recruiterJobs = await Job.find({ created_by: recruiterId })
             .populate('applications')
             .populate('company');
 
         const jobIds = recruiterJobs.map(job => job._id);
 
-        // Get all applications for recruiter's jobs with date filter
         const applications = await Application.find({
             job: { $in: jobIds },
             ...dateFilter
         }).populate('applicant').populate('job');
 
-        // Calculate metrics
         const totalJobs = recruiterJobs.length;
         const totalApplications = applications.length;
         const totalCompanies = await Company.countDocuments({ userId: recruiterId });
 
-        // Application status breakdown
         const statusBreakdown = {
             pending: applications.filter(app => app.status === 'pending').length,
             accepted: applications.filter(app => app.status === 'accepted').length,
             rejected: applications.filter(app => app.status === 'rejected').length
         };
 
-        // Calculate conversion rates
         const acceptanceRate = totalApplications > 0
             ? ((statusBreakdown.accepted / totalApplications) * 100).toFixed(1)
             : 0;
@@ -51,7 +45,6 @@ export const getRecruiterAnalytics = async (req, res) => {
             ? (totalApplications / totalJobs).toFixed(1)
             : 0;
 
-        // Time series data (last 30 days)
         const last30Days = [];
         for (let i = 29; i >= 0; i--) {
             const date = new Date();
@@ -72,7 +65,6 @@ export const getRecruiterAnalytics = async (req, res) => {
             });
         }
 
-        // Top performing jobs
         const jobPerformance = recruiterJobs.map(job => ({
             id: job._id,
             title: job.title,
@@ -83,7 +75,7 @@ export const getRecruiterAnalytics = async (req, res) => {
             ).length
         })).sort((a, b) => b.applicants - a.applicants).slice(0, 5);
 
-        // Recent activity (last 10 applications)
+     
         const recentActivity = applications
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .slice(0, 10)
@@ -95,7 +87,6 @@ export const getRecruiterAnalytics = async (req, res) => {
                 createdAt: app.createdAt
             }));
 
-        // Calculate average time to hire (for accepted applications)
         const acceptedApps = applications.filter(app => app.status === 'accepted');
         let avgTimeToHire = 0;
         if (acceptedApps.length > 0) {
@@ -145,7 +136,7 @@ export const getJobAnalytics = async (req, res) => {
         const { jobId } = req.params;
         const recruiterId = req.id;
 
-        // Verify job belongs to recruiter
+        
         const job = await Job.findOne({ _id: jobId, created_by: recruiterId })
             .populate('applications')
             .populate('company');
@@ -157,7 +148,7 @@ export const getJobAnalytics = async (req, res) => {
             });
         }
 
-        // Get all applications for this job
+   
         const applications = await Application.find({ job: jobId })
             .populate('applicant');
 

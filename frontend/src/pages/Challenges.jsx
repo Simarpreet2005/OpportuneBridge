@@ -1,5 +1,4 @@
 import React from 'react'
-import Navbar from '../components/shared/Navbar'
 import HomeFeed from '../components/home/HomeFeed'
 import Footer from '../components/shared/Footer'
 

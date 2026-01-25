@@ -5,11 +5,8 @@ import { setUser } from "@/redux/authSlice";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    // Syncing with Redux for backward compatibility
     const { user: reduxUser } = useSelector((store) => store.auth);
     const dispatch = useDispatch();
-
-    // We'll use Redux as the source of truth but expose via Context API for the new components
     const [user, setLocalUser] = useState(reduxUser);
 
     useEffect(() => {
