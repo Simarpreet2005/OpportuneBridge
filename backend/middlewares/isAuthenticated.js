@@ -19,7 +19,11 @@ const isAuthenticated = async (req, res, next) => {
         req.id = decode.userId;
         next();
     } catch (error) {
-        console.log(error);
+        console.error("Authentication error:", error.message);
+        return res.status(401).cookie("token", "", { maxAge: 0 }).json({
+            message: "Session expired. Please log in again.",
+            success: false
+        });
     }
 }
 export default isAuthenticated;

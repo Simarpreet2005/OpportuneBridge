@@ -1,7 +1,8 @@
 import axios from "axios";
+import { BASE_URL } from "./utils/constant";
 
 const api = axios.create({
-    baseURL: "https://opportunebridge-backend.onrender.com/api/v1",
+    baseURL: BASE_URL,
     withCredentials: true
 });
 

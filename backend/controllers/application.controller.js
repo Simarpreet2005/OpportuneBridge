@@ -1,5 +1,6 @@
 import { Application } from "../models/application.model.js";
 import { Job } from "../models/job.model.js";
+import { generateGeminiText, parseGeminiJson } from "../utils/gemini.js";
 
 export const applyJob = async (req, res) => {
     try {
@@ -147,17 +148,6 @@ export const checkApplicantATS = async (req, res) => {
         const applicant = application.applicant;
         const job = application.job;
 
-        const { GoogleGenerativeAI } = await import("@google/generative-ai");
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(400).json({
-                message: "AI service not configured",
-                success: false
-            });
-        }
-
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-
         const prompt = `Act as an ATS (Applicant Tracking System). Analyze this candidate's profile against the job requirements.
 
 Candidate Profile:
@@ -179,10 +169,8 @@ Provide:
 Return JSON format: { "score": number, "analysis": "string", "missingSkills": ["string"], "recommendation": "string" }
 Return ONLY the JSON.`;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text().replace(/```json|```/g, "").trim();
-        const data = JSON.parse(text);
+        const text = await generateGeminiText(prompt);
+        const data = parseGeminiJson(text);
 
         return res.status(200).json({
             ...data,

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Navbar from './shared/Navbar'
 import FilterCard from './FilterCard'
 import Job from './job';
 import { useSelector } from 'react-redux';
@@ -12,33 +11,58 @@ const Jobs = () => {
     useGetAllJobs();
     const { allJobs, searchedQuery } = useSelector(store => store.job);
     const [filterJobs, setFilterJobs] = useState(allJobs);
+    const [selectedFilters, setSelectedFilters] = useState({
+        Location: [],
+        Industry: [],
+        "Opportunity Type": [],
+        Salary: [],
+    });
 
     useEffect(() => {
-        console.log("Jobs component - allJobs:", allJobs);
-        console.log("Jobs component - searchedQuery:", searchedQuery);
-    }, [allJobs, searchedQuery]);
+        const normalizedQuery = searchedQuery?.trim().toLowerCase() || "";
 
-    useEffect(() => {
-        if (searchedQuery) {
-            const filteredJobs = allJobs.filter((job) => {
-                return job.title.toLowerCase().includes(searchedQuery.toLowerCase()) ||
-                    job.description.toLowerCase().includes(searchedQuery.toLowerCase()) ||
-                    job.location.toLowerCase().includes(searchedQuery.toLowerCase()) ||
-                    (job.salary && job.salary.toString().toLowerCase().includes(searchedQuery.toLowerCase())) ||
-                    (job.jobType && job.jobType.toLowerCase().includes(searchedQuery.toLowerCase()))
-            })
-            setFilterJobs(filteredJobs)
-        } else {
-            setFilterJobs(allJobs)
-        }
-    }, [allJobs, searchedQuery]);
+        const filteredJobs = allJobs.filter((job) => {
+            const matchesSearch = !normalizedQuery || [
+                job.title,
+                job.description,
+                job.location,
+                job.jobType,
+                job.salary?.toString(),
+                job?.company?.name
+            ]
+                .filter(Boolean)
+                .some((value) => value.toLowerCase().includes(normalizedQuery));
+
+            const matchesLocation = selectedFilters.Location.length === 0
+                || selectedFilters.Location.some((location) => job.location?.toLowerCase().includes(location.toLowerCase()));
+
+            const matchesIndustry = selectedFilters.Industry.length === 0
+                || selectedFilters.Industry.some((industry) => job.title?.toLowerCase().includes(industry.toLowerCase()));
+
+            const matchesOpportunityType = selectedFilters["Opportunity Type"].length === 0
+                || selectedFilters["Opportunity Type"].some((type) => job.jobType?.toLowerCase() === type.toLowerCase());
+
+            const matchesSalary = selectedFilters.Salary.length === 0 || selectedFilters.Salary.some((range) => {
+                const salary = Number(job.salary);
+                if (Number.isNaN(salary)) return false;
+                if (range === "0-40k") return salary <= 40000;
+                if (range === "42k-1lakh") return salary >= 42000 && salary <= 100000;
+                if (range === "1lakh to 5lakh") return salary >= 100000 && salary <= 500000;
+                return false;
+            });
+
+            return matchesSearch && matchesLocation && matchesIndustry && matchesOpportunityType && matchesSalary;
+        });
+
+        setFilterJobs(filteredJobs);
+    }, [allJobs, searchedQuery, selectedFilters]);
 
     return (
         <div>
             <div className='max-w-7xl mx-auto mt-5'>
                 <div className='flex gap-5'>
                     <div className='w-20%'>
-                        <FilterCard />
+                        <FilterCard selectedFilters={selectedFilters} onFilterChange={setSelectedFilters} />
                     </div>
                     {
                         filterJobs.length <= 0 ? (

@@ -8,16 +8,19 @@ const router = express.Router();
 
 router.post("/upload", isAuthenticated, upload.single("resume"), async (req, res) => {
     try {
+        if (!req.file) {
+            return res.status(400).json({ message: "Resume file is required" });
+        }
+
         const resume = await Resume.create({
-            userId: req.user.id,
+            user: req.id,
             fileUrl: `/uploads/${req.file.filename}`,
-            parsedText: "",
-            atsScore: 0,
-            missingSkills: []
+            originalFileName: req.file.originalname,
+            title: req.file.originalname
         });
 
-        await User.findByIdAndUpdate(req.user.id, {
-            $push: { resumes: resume._id }
+        await User.findByIdAndUpdate(req.id, {
+            $push: { "profile.resumes": resume._id }
         });
 
         res.json(resume);

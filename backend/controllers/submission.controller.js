@@ -1,8 +1,6 @@
 import { Submission } from "../models/submission.model.js";
 import { Challenge } from "../models/challenge.model.js";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
+import { generateGeminiText, parseGeminiJson } from "../utils/gemini.js";
 
 export const submitCode = async (req, res) => {
     try {
@@ -31,10 +29,8 @@ export const submitCode = async (req, res) => {
         let aiFeedback = "";
         let status = "Pending";
 
-        if (genAI) {
-            try {
-                const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-                const prompt = `Evaluate the following code submission for the challenge: "${challenge.title}".
+        try {
+            const prompt = `Evaluate the following code submission for the challenge: "${challenge.title}".
                 
                 Challenge Description: ${challenge.description}
                 Target Tech Stack: ${challenge.techStack?.join(", ")}
@@ -55,24 +51,13 @@ export const submitCode = async (req, res) => {
                 }
                 Return ONLY the JSON.`;
 
-                const result = await model.generateContent(prompt);
-                const response = await result.response;
-                const text = response.text();
-
-                const jsonMatch = text.match(/\{[\s\S]*\}/);
-                if (jsonMatch) {
-                    const data = JSON.parse(jsonMatch[0]);
-                    status = data.status || "Pending";
-                    aiFeedback = data.feedback || "Logic evaluation complete.";
-                } else {
-                    aiFeedback = "AI evaluation completed but format was unexpected.";
-                }
-            } catch (err) {
-                console.error("AI Submission Evaluation Error:", err.message);
-                aiFeedback = "AI evaluation failed due to a technical error.";
-            }
-        } else {
-            aiFeedback = "AI service not configured for evaluation.";
+            const text = await generateGeminiText(prompt);
+            const data = parseGeminiJson(text);
+            status = data.status || "Pending";
+            aiFeedback = data.feedback || "Logic evaluation complete.";
+        } catch (err) {
+            console.error("AI Submission Evaluation Error:", err.message);
+            aiFeedback = "AI evaluation failed due to a technical error.";
         }
 
         // 3. Update submission with AI results

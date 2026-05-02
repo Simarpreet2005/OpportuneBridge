@@ -61,8 +61,7 @@ const HeroSection = () => {
                         <Button
                             onClick={searchJobHandler}
                             variant="accent"
-                            size="lg"
-                            className="rounded-r-2xl rounded-l-xl h-full m-0.5 py-6 px-8"
+                            className="rounded-r-2xl rounded-l-xl h-[44px] m-1 px-5 text-sm font-semibold"
                         >
                             Search
                         </Button>

@@ -1,18 +1,10 @@
 import { MockInterview } from "../models/mockInterview.model.js";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
+import { generateGeminiText, parseGeminiJson } from "../utils/gemini.js";
 
 export const startMockInterview = async (req, res) => {
     try {
         const { jobRole, experience, techStack, jobDescription } = req.body;
         const userId = req.id;
-
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ message: "AI service not configured (API Key missing)", success: false });
-        }
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
         const jobDescContext = jobDescription
             ? `\n\nJob Description:\n${jobDescription}\n\nGenerate questions that are specifically relevant to this job posting.`
@@ -25,14 +17,8 @@ export const startMockInterview = async (req, res) => {
         let responseText = "";
         let questions = [];
         try {
-            const result = await model.generateContent(prompt);
-            responseText = result.response.text();
-
-            const jsonMatch = responseText.match(/\[[\s\S]*\]/);
-            if (!jsonMatch) {
-                throw new Error("No JSON array found in Gemini response");
-            }
-            questions = JSON.parse(jsonMatch[0]);
+            responseText = await generateGeminiText(prompt);
+            questions = parseGeminiJson(responseText, "array");
         } catch (e) {
             console.error("Mock Interview Questions Gen Error:", e.message, "Raw:", responseText);
             return res.status(500).json({ message: "Failed to generate interview questions. Please try again.", success: false });
@@ -74,9 +60,6 @@ export const submitAnswers = async (req, res) => {
             }
         });
 
-
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
         const evaluationPrompt = `Evaluate the following interview performance strictly based on the REALITY of the provided answers. 
         Do NOT assume any knowledge or skills that the candidate has not explicitly demonstrated in their response.
         
@@ -102,14 +85,8 @@ export const submitAnswers = async (req, res) => {
 
         let evalText = "";
         try {
-            const evalResult = await model.generateContent(evaluationPrompt);
-            evalText = evalResult.response.text();
-
-            const jsonMatch = evalText.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) {
-                throw new Error("No JSON object found in Gemini response");
-            }
-            const evalData = JSON.parse(jsonMatch[0]);
+            evalText = await generateGeminiText(evaluationPrompt);
+            const evalData = parseGeminiJson(evalText);
 
 
             evalData.questionEvaluations.forEach((evalItem, i) => {

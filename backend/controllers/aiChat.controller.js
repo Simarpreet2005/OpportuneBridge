@@ -1,42 +1,35 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { User } from "../models/user.model.js";
+import { generateGeminiText, parseGeminiJson, sendGeminiChat } from "../utils/gemini.js";
 
 export function buildPrompt(userInput) {
-    return `
-You are a job market expert.
+    return `You are Career AI, the in-app assistant for OpportuneBridge.
 
-Rules:
-- Never ask clarifying questions.
-- If info is missing, assume:
-  Location = India
-  Industry = Tech
-  Level = Entry to Mid
-- Give specific, actionable answers in table format.
+Answer the user's exact message first. Be useful for jobs, resumes, interviews, applications, skills, salary, hiring, and platform guidance.
 
-User request:
-${userInput}
-`;
+Response rules:
+- Stay relevant to the user's question. Do not force a table unless comparison data genuinely helps.
+- If the user asks for resume help, give concrete wording or bullet improvements.
+- If the user asks for interview help, include sample answers or practice questions.
+- If the user asks for job search help, include practical next steps.
+- If the user asks something outside careers, answer briefly when safe, then connect back only if helpful.
+- Keep replies concise, friendly, and actionable.
+- Use India/tech/entry-to-mid level assumptions only when the user leaves those details out and they matter.
+
+User message: ${userInput}`;
 }
 
 export const aiChatbot = async (req, res) => {
     try {
         const { message, history } = req.body;
-        const userId = req.id;
 
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ message: "Gemini API Key missing", success: false });
+        if (!message?.trim()) {
+            return res.status(400).json({ message: "Message is required", success: false });
         }
 
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-
-        const chat = model.startChat({
-            history: history || [],
-        });
-
         const prompt = buildPrompt(message);
-        const result = await chat.sendMessage(prompt);
-        let reply = result.response.text();
+        let reply = await sendGeminiChat({
+            message: prompt,
+            history: history || []
+        });
 
         if (reply.includes("```")) {
             reply = reply.replace(/```(json)?|```/g, "").trim();
@@ -57,12 +50,9 @@ export const getATSScore = async (req, res) => {
     try {
         const { resumeText, jobDescription } = req.body;
 
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ message: "Gemini API Key missing", success: false });
+        if (!resumeText || !jobDescription) {
+            return res.status(400).json({ message: "Resume text and job description are required", success: false });
         }
-
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
         const prompt = `
         Act as an expert Applicant Tracking System (ATS).
@@ -82,14 +72,8 @@ export const getATSScore = async (req, res) => {
 
         let text = "";
         try {
-            const result = await model.generateContent(prompt);
-            text = result.response.text();
-
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) {
-                throw new Error("No JSON object found in Gemini response");
-            }
-            const data = JSON.parse(jsonMatch[0]);
+            text = await generateGeminiText(prompt);
+            const data = parseGeminiJson(text);
 
             return res.status(200).json({
                 success: true,

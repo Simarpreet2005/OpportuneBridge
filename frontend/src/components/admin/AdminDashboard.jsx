@@ -18,7 +18,7 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
 
     const [timeRange, setTimeRange] = useState('30');
-    const { analytics, loading } = useAnalytics(timeRange);
+    const { analytics, loading, error, refetch } = useAnalytics(timeRange);
 
     const timeRanges = [
         { label: '7 Days', value: '7' },
@@ -29,7 +29,7 @@ const AdminDashboard = () => {
 
     if (loading) {
         return (
-            <div className='min-h-screen bg-[#f8f9fc] flex items-center justify-center'>
+            <div className='min-h-screen flex items-center justify-center'>
                 <Loader2 className='w-8 h-8 animate-spin text-primary' />
             </div>
         );
@@ -43,7 +43,7 @@ const AdminDashboard = () => {
     const funnel = analytics?.funnel || {};
 
     return (
-        <div className='min-h-screen bg-[#f8f9fc]'>
+        <div className='min-h-screen'>
             <div className='max-w-7xl mx-auto px-4 py-8 lg:py-12'>
                 {/* Header */}
                 <div className='flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4'>
@@ -76,6 +76,22 @@ const AdminDashboard = () => {
                         </Button>
                     ))}
                 </div>
+
+                {/* Error Banner */}
+                {error && (
+                    <div className='flex items-center justify-between bg-red-50 border border-red-200 text-red-700 rounded-xl px-5 py-4 mb-8'>
+                        <div className='flex items-center gap-3'>
+                            <span className='text-xl'>⚠️</span>
+                            <span className='font-medium'>{error}</span>
+                        </div>
+                        <button
+                            onClick={refetch}
+                            className='ml-4 px-4 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors font-medium'
+                        >
+                            Retry
+                        </button>
+                    </div>
+                )}
 
                 {/* Key Metrics Grid */}
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10'>

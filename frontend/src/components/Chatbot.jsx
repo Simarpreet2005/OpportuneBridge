@@ -4,6 +4,7 @@ import { Input } from './ui/input';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AICHAT_API_END_POINT } from '../utils/constant';
 
 const Chatbot = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -22,17 +23,18 @@ const Chatbot = () => {
 
     const sendMessage = async (e) => {
         e.preventDefault();
-        if (!message.trim()) return;
+        const outgoingMessage = message.trim();
+        if (!outgoingMessage) return;
 
-        const userMessage = { role: "user", parts: [{ text: message }] };
+        const userMessage = { role: "user", parts: [{ text: outgoingMessage }] };
         setChatHistory([...chatHistory, userMessage]);
         setMessage("");
         setIsLoading(true);
 
         try {
             const historyToSend = chatHistory.slice(1).map(item => ({ role: item.role, parts: item.parts }));
-            const res = await axios.post(`https://opportunebridge-backend.onrender.com/api/v1/aichat/chat`, {
-                message,
+            const res = await axios.post(`${AICHAT_API_END_POINT}/chat`, {
+                message: outgoingMessage,
                 history: historyToSend
             }, { withCredentials: true });
 
@@ -41,7 +43,11 @@ const Chatbot = () => {
             }
         } catch (error) {
             console.error(error);
-            setChatHistory(prev => [...prev, { role: "model", parts: [{ text: "Sorry, I'm having trouble connecting right now." }] }]);
+            const status = error.response?.status;
+            const fallback = status === 401
+                ? "Please log in again so I can help with your account."
+                : "Sorry, I could not get a useful AI response just now. Try again in a moment.";
+            setChatHistory(prev => [...prev, { role: "model", parts: [{ text: fallback }] }]);
         } finally {
             setIsLoading(false);
         }
@@ -70,7 +76,7 @@ const Chatbot = () => {
                         <div ref={scrollRef} className="h-96 p-4 overflow-y-auto space-y-4 bg-gray-50">
                             {chatHistory.map((item, index) => (
                                 <div key={index} className={`flex ${item.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${item.role === 'user' ? 'bg-[#1E3A8A] text-white rounded-tr-none' : 'bg-white border text-gray-800 rounded-tl-none'}`}>
+                                    <div className={`max-w-[80%] p-3 rounded-2xl text-sm whitespace-pre-line ${item.role === 'user' ? 'bg-[#1E3A8A] text-white rounded-tr-none' : 'bg-white border text-gray-800 rounded-tl-none'}`}>
                                         {item.parts[0].text}
                                     </div>
                                 </div>

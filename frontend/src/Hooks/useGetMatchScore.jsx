@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { AI_API_END_POINT } from '@/utils/constant';
 
 const useGetMatchScore = (targetId, targetType = 'Challenge') => {
     const [score, setScore] = useState(null);
@@ -12,7 +13,7 @@ const useGetMatchScore = (targetId, targetType = 'Challenge') => {
 
             setLoading(true);
             try {
-                const res = await axios.post("https://opportunebridge-backend.onrender.com/api/v1/ai/score",
+                const res = await axios.post(`${AI_API_END_POINT}/score`,
                     { targetId, targetType },
                     { withCredentials: true }
                 );

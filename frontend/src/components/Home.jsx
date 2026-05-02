@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react'
-import Navbar from './shared/Navbar'
-import HomeFeed from './home/HomeFeed'
 import HeroSection from './HeroSection'
 import LatestJobs from './LatestJobs'
 import useGetAllJobs from '@/Hooks/useGetAllJobs'
@@ -21,7 +19,7 @@ const Home = () => {
 
 
   return (
-    <div className='bg-background min-h-screen'>
+    <div className='min-h-screen'>
       <div className="pt-8 pb-4">
         <HeroSection />
       </div>

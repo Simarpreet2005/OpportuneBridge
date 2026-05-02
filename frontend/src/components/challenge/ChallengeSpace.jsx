@@ -60,7 +60,7 @@ const ChallengeSpace = () => {
     if (!challenge) return <div className='h-screen flex items-center justify-center'>Challenge not found</div>;
 
     return (
-        <div className='flex flex-col h-screen bg-background'>
+        <div className='flex flex-col h-screen'>
 
             <div className='flex-1 flex overflow-hidden'>
                 <div className='w-2/5 p-6 overflow-y-auto border-r border-border'>

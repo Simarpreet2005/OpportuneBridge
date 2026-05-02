@@ -27,7 +27,7 @@ import ACTIONS from "./utils/socketAction.js";
 
 
 const app = express();
-console.log("Startup Check - GEMINI_API_KEY:", process.env.GEMINI_API_KEY ? "Loaded (Starts with " + process.env.GEMINI_API_KEY.substring(0, 5) + ")" : "NOT LOADED");
+console.log("Startup Check - GEMINI_API_KEY:", process.env.GEMINI_API_KEY ? "Loaded" : "NOT LOADED");
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -71,6 +71,22 @@ io.on('connection', (socket) => {
 
   socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
     io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
+  });
+
+  socket.on(ACTIONS.OFFER, ({ to, offer }) => {
+    io.to(to).emit(ACTIONS.OFFER, { from: socket.id, offer });
+  });
+
+  socket.on(ACTIONS.ANSWER, ({ to, answer }) => {
+    io.to(to).emit(ACTIONS.ANSWER, { from: socket.id, answer });
+  });
+
+  socket.on(ACTIONS.ICE_CANDIDATE, ({ to, candidate }) => {
+    io.to(to).emit(ACTIONS.ICE_CANDIDATE, { from: socket.id, candidate });
+  });
+
+  socket.on(ACTIONS.CHAT_MESSAGE, ({ roomId, message, username }) => {
+    socket.in(roomId).emit(ACTIONS.CHAT_MESSAGE, { message, username, socketId: socket.id });
   });
 
   socket.on('disconnecting', () => {

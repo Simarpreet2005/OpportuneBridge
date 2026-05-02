@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import Navbar from '../shared/Navbar'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
@@ -11,7 +10,12 @@ import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 
-const companyArray = [];
+const parseSalaryForSubmit = (raw) => {
+    if (raw === undefined || raw === null || raw === "") return NaN;
+    const cleaned = String(raw).trim().replace(/,/g, "");
+    const n = parseFloat(cleaned);
+    return Number.isFinite(n) ? n : NaN;
+};
 
 const PostJob = () => {
     const [input, setInput] = useState({
@@ -22,8 +26,9 @@ const PostJob = () => {
         location: "",
         jobType: "",
         experience: "",
-        position: 0,
-        companyId: ""
+        position: "",
+        companyId: "",
+        opportunityType: "Job"
     });
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -31,22 +36,57 @@ const PostJob = () => {
     const { companies } = useSelector(store => store.company);
     const changeEventHandler = (e) => {
         const { name, value, type } = e.target;
-        setInput({
-            ...input,
-            [name]: type === 'number' || name === 'salary' ? (value === '' ? '' : Number(value)) : value
-        });
+        if (name === "salary") {
+            setInput((prev) => ({ ...prev, salary: value }));
+            return;
+        }
+        if (type === "number" || name === "position") {
+            setInput((prev) => ({
+                ...prev,
+                [name]: value === "" ? "" : Number(value)
+            }));
+            return;
+        }
+        setInput((prev) => ({ ...prev, [name]: value }));
     };
 
     const selectChangeHandler = (value) => {
         const selectedCompany = companies.find((company) => company.name.toLowerCase() === value);
-        setInput({ ...input, companyId: selectedCompany._id });
+        if (!selectedCompany?._id) return;
+        setInput((prev) => ({ ...prev, companyId: selectedCompany._id }));
     };
 
     const submitHandler = async (e) => {
         e.preventDefault();
+        const salaryNum = parseSalaryForSubmit(input.salary);
+        const positionNum = input.position === "" ? NaN : Number(input.position);
+        if (!input.companyId) {
+            toast.error("Please select a company.");
+            return;
+        }
+        if (!Number.isFinite(salaryNum) || salaryNum < 0) {
+            toast.error("Enter a valid salary (numbers only, e.g. 12 or 12.5).");
+            return;
+        }
+        if (!Number.isFinite(positionNum) || positionNum < 1) {
+            toast.error("Enter a valid number of open positions (at least 1).");
+            return;
+        }
+        const payload = {
+            title: input.title,
+            description: input.description,
+            requirements: input.requirements,
+            salary: salaryNum,
+            location: input.location,
+            jobType: input.jobType,
+            experience: input.experience,
+            position: positionNum,
+            companyId: input.companyId,
+            opportunityType: input.opportunityType || "Job"
+        };
         try {
             setLoading(true);
-            const res = await axios.post(`${JOB_API_END_POINT}/post`, input, {
+            const res = await axios.post(`${JOB_API_END_POINT}/post`, payload, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -105,6 +145,7 @@ const PostJob = () => {
                                 name="salary"
                                 value={input.salary}
                                 onChange={changeEventHandler}
+                                placeholder="e.g. 12 or 12.5 (LPA)"
                                 className="focus-visible:ring-offset-0 focus-visible:ring-0 my-1"
                             />
                         </div>
@@ -140,7 +181,10 @@ const PostJob = () => {
                         </div>
                         <div>
                             <Label>Opportunity Type</Label>
-                            <Select onValueChange={(value) => setInput({ ...input, opportunityType: value })}>
+                            <Select
+                                value={input.opportunityType}
+                                onValueChange={(value) => setInput((prev) => ({ ...prev, opportunityType: value }))}
+                            >
                                 <SelectTrigger className="w-full my-1">
                                     <SelectValue placeholder="Select Opportunity Type" />
                                 </SelectTrigger>
@@ -163,7 +207,10 @@ const PostJob = () => {
                         </div>
                         {
                             companies.length > 0 && (
-                                <Select onValueChange={selectChangeHandler}>
+                                <Select
+                                    value={companies.find((c) => c._id === input.companyId)?.name?.toLowerCase() ?? ""}
+                                    onValueChange={selectChangeHandler}
+                                >
                                     <SelectTrigger className="w-[180px]">
                                         <SelectValue placeholder="Select a Company" />
                                     </SelectTrigger>

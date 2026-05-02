@@ -8,6 +8,7 @@ import axios from 'axios'
 import { setResumes } from '@/redux/resumeSlice'
 import { toast } from 'sonner'
 import Footer from '../shared/Footer'
+import { RESUME_API_END_POINT } from '@/utils/constant'
 
 const ResumeList = () => {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ const ResumeList = () => {
     useEffect(() => {
         const fetchResumes = async () => {
             try {
-                const res = await axios.get('https://opportunebridge-backend.onrender.com/api/v1/resume/get', { withCredentials: true });
+                const res = await axios.get(`${RESUME_API_END_POINT}/get`, { withCredentials: true });
                 if (res.data.success) {
                     dispatch(setResumes(res.data.resumes));
                 }
@@ -30,18 +31,18 @@ const ResumeList = () => {
 
     const deleteResume = async (id) => {
         try {
-            const res = await axios.delete(`https://opportunebridge-backend.onrender.com/api/v1/resume/delete/${id}`, { withCredentials: true });
+            const res = await axios.delete(`${RESUME_API_END_POINT}/delete/${id}`, { withCredentials: true });
             if (res.data.success) {
                 toast.success(res.data.message);
                 dispatch(setResumes(resumes.filter(r => r._id !== id)));
             }
         } catch (error) {
-            toast.error(error.response.data.message);
+            toast.error(error.response?.data?.message || "Failed to delete resume");
         }
     }
 
     return (
-        <div className='min-h-screen bg-gray-50/50'>
+        <div className='min-h-screen'>
             <div className='max-w-7xl mx-auto px-4 py-12'>
                 <div className='flex items-center justify-between mb-10'>
                     <div>

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Navbar from '../shared/Navbar'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { RadioGroup } from '../ui/radio-group'
@@ -93,14 +92,15 @@ const Signup = () => {
     });
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="min-h-screen flex items-center justify-center p-6">
             <div className='flex items-center justify-center max-w-7xl mx-auto w-full'>
-                <form onSubmit={submitHandler} className='w-full max-w-md bg-white/90 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-8 my-10'>
-                    <div className='text-center mb-6'>
+                <form onSubmit={submitHandler} className='w-full max-w-md bg-white/90 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-10 my-12'>
+                    <div className='text-center mb-10'>
                         <h1 className='font-bold text-3xl text-gray-900'>Create Account</h1>
-                        <p className='text-gray-500 text-sm mt-1'>Join OpportuneBridge to start your journey</p>
+                        <p className='text-gray-500 text-sm mt-2'>Join OpportuneBridge to start your journey</p>
                     </div>
-                    <div className='my-2'>
+                    <div className='space-y-5'>
+                        <div>
                         <Label>Full Name</Label>
                         <Input
                             type="text"
@@ -109,8 +109,8 @@ const Signup = () => {
                             onChange={changeEventHandler}
                             placeholder="example"
                         />
-                    </div>
-                    <div className='my-2'>
+                        </div>
+                        <div>
                         <Label>Email</Label>
                         <Input
                             type="email"
@@ -119,8 +119,8 @@ const Signup = () => {
                             onChange={changeEventHandler}
                             placeholder="example@gmail.com"
                         />
-                    </div>
-                    <div className='my-2'>
+                        </div>
+                        <div>
                         <Label>Phone Number</Label>
                         <Input
                             type="text"
@@ -129,8 +129,8 @@ const Signup = () => {
                             onChange={changeEventHandler}
                             placeholder="8080808080"
                         />
-                    </div>
-                    <div className='my-2'>
+                        </div>
+                        <div>
                         <Label>Password</Label>
                         <div className='relative'>
                             <Input
@@ -147,29 +147,32 @@ const Signup = () => {
                             >
                                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
+                            </div>
                         </div>
                     </div>
-                    <div className='flex items-center justify-between'>
+                    <div className='flex items-center justify-between mt-8 mb-3'>
                         <RadioGroup className="flex items-center gap-4 my-5">
                             <div className="flex items-center space-x-2">
-                                <Input
+                                <input
                                     type="radio"
                                     name="role"
+                                    id="r1"
                                     value="student"
                                     checked={input.role === 'student'}
                                     onChange={changeEventHandler}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer w-4 h-4 accent-blue-600"
                                 />
                                 <Label htmlFor="r1">Student</Label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <Input
+                                <input
                                     type="radio"
                                     name="role"
+                                    id="r2"
                                     value="recruiter"
                                     checked={input.role === 'recruiter'}
                                     onChange={changeEventHandler}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer w-4 h-4 accent-blue-600"
                                 />
                                 <Label htmlFor="r2">Recruiter</Label>
                             </div>
@@ -185,7 +188,7 @@ const Signup = () => {
                         </div>
                     </div>
                     {
-                        loading ? <Button className="w-full my-4"> <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please wait </Button> : <Button type="submit" className="w-full my-4">Signup</Button>
+                        loading ? <Button className="w-full my-5"> <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please wait </Button> : <Button type="submit" className="w-full my-5">Signup</Button>
                     }
                     <div className='flex items-center gap-2 my-2'>
                         <div className='flex-1 h-[1px] bg-gray-300'></div>

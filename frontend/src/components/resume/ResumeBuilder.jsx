@@ -8,9 +8,105 @@ import { Plus, Trash, Sparkles, Loader2, Save, Download, ChevronRight, ChevronLe
 import ResumePreview from './ResumePreview'
 import axios from 'axios'
 import { toast } from 'sonner'
+import { RESUME_API_END_POINT } from '@/utils/constant'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
+
+const createEmptyResumeData = () => ({
+    title: "Untitled Resume",
+    personalInfo: { fullName: "", email: "", phoneNumber: "", address: "", summary: "" },
+    education: [{ institution: "", degree: "", fieldOfStudy: "", startDate: "", endDate: "", description: "" }],
+    experience: [{ company: "", role: "", location: "", startDate: "", endDate: "", description: "", isCurrent: false }],
+    projects: [{ title: "", description: "", link: "", technologies: [] }],
+    skills: [""],
+    languages: [""],
+    certifications: [{ name: "", issuer: "", year: "" }],
+    templateId: "modern"
+});
+
+const ensureArray = (value, fallback) => Array.isArray(value) ? value : fallback;
+
+const normalizeResumeData = (resume = {}) => {
+    const empty = createEmptyResumeData();
+
+    return {
+        ...empty,
+        ...resume,
+        personalInfo: { ...empty.personalInfo, ...(resume.personalInfo || {}) },
+        education: ensureArray(resume.education, empty.education),
+        experience: ensureArray(resume.experience, empty.experience),
+        projects: ensureArray(resume.projects, empty.projects),
+        skills: ensureArray(resume.skills, empty.skills),
+        languages: ensureArray(resume.languages, empty.languages),
+        certifications: ensureArray(resume.certifications, empty.certifications),
+        templateId: resume.templateId || empty.templateId
+    };
+};
+
+const buildResumePayload = (resume) => ({
+    title: resume.title || "Untitled Resume",
+    personalInfo: resume.personalInfo,
+    education: resume.education || [],
+    experience: resume.experience || [],
+    projects: resume.projects || [],
+    skills: (resume.skills || []).map(skill => String(skill).trim()).filter(Boolean),
+    languages: (resume.languages || []).map(language => String(language).trim()).filter(Boolean),
+    certifications: resume.certifications || [],
+    templateId: resume.templateId || "modern"
+});
+
+const getErrorMessage = (error, fallback) => error.response?.data?.message || fallback;
+
+const isSafeCssColor = (value) => {
+    return !value
+        || value === "transparent"
+        || value.startsWith("rgb")
+        || value.startsWith("#")
+        || /^[a-z]+$/i.test(value);
+};
+
+const safeColor = (value, fallback) => isSafeCssColor(value) ? value : fallback;
+
+const createPdfClone = (source) => {
+    const wrapper = document.createElement("div");
+    wrapper.style.position = "fixed";
+    wrapper.style.left = "-10000px";
+    wrapper.style.top = "0";
+    wrapper.style.width = "800px";
+    wrapper.style.background = "#ffffff";
+    wrapper.style.zIndex = "-1";
+
+    const clone = source.cloneNode(true);
+    clone.id = "resume-pdf-export";
+    clone.style.width = "800px";
+    clone.style.maxWidth = "800px";
+    clone.style.backgroundColor = "#ffffff";
+    clone.style.boxShadow = "none";
+
+    const sourceNodes = [source, ...source.querySelectorAll("*")];
+    const cloneNodes = [clone, ...clone.querySelectorAll("*")];
+
+    sourceNodes.forEach((node, index) => {
+        const target = cloneNodes[index];
+        if (!target || !(node instanceof Element) || !(target instanceof Element) || !target.style) return;
+
+        const style = window.getComputedStyle(node);
+        target.style.color = safeColor(style.color, "#1f2937");
+        target.style.backgroundColor = safeColor(style.backgroundColor, "transparent");
+        target.style.borderTopColor = safeColor(style.borderTopColor, "#e5e7eb");
+        target.style.borderRightColor = safeColor(style.borderRightColor, "#e5e7eb");
+        target.style.borderBottomColor = safeColor(style.borderBottomColor, "#e5e7eb");
+        target.style.borderLeftColor = safeColor(style.borderLeftColor, "#e5e7eb");
+        target.style.textDecorationColor = safeColor(style.textDecorationColor, "currentColor");
+        target.style.boxShadow = "none";
+    });
+
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+
+    return { wrapper, clone };
+};
 
 const ResumeBuilder = () => {
     const { id } = useParams();
@@ -18,31 +114,22 @@ const ResumeBuilder = () => {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [aiLoading, setAiLoading] = useState(false);
+    const [pdfLoading, setPdfLoading] = useState(false);
     const [atsResult, setAtsResult] = useState(null);
     const [atsOpen, setAtsOpen] = useState(false);
 
-    const [data, setData] = useState({
-        title: "Untitled Resume",
-        personalInfo: { fullName: "", email: "", phoneNumber: "", address: "", summary: "" },
-        education: [{ institution: "", degree: "", fieldOfStudy: "", startDate: "", endDate: "", description: "" }],
-        experience: [{ company: "", role: "", location: "", startDate: "", endDate: "", description: "", isCurrent: false }],
-        projects: [{ title: "", description: "", link: "", technologies: [] }],
-        skills: [""],
-        languages: [""],
-        certifications: [{ name: "", issuer: "", year: "" }],
-        templateId: "modern"
-    });
+    const [data, setData] = useState(createEmptyResumeData);
 
     useEffect(() => {
         if (id) {
             const fetchResume = async () => {
                 try {
-                    const res = await axios.get(`https://opportunebridge-backend.onrender.com/api/v1/resume/get/${id}`, { withCredentials: true });
+                    const res = await axios.get(`${RESUME_API_END_POINT}/get/${id}`, { withCredentials: true });
                     if (res.data.success) {
-                        setData(res.data.resume);
+                        setData(normalizeResumeData(res.data.resume));
                     }
                 } catch (error) {
-                    toast.error("Failed to load resume");
+                    toast.error(getErrorMessage(error, "Failed to load resume"));
                 }
             }
             fetchResume();
@@ -53,7 +140,7 @@ const ResumeBuilder = () => {
         if (section === 'personalInfo') {
             setData({ ...data, personalInfo: { ...data.personalInfo, [field]: e.target.value } });
         } else if (index !== undefined) {
-            const updatedSection = [...data[section]];
+            const updatedSection = [...(data[section] || [])];
             if (field) {
                 updatedSection[index][field] = e.target.value;
             } else {
@@ -66,11 +153,11 @@ const ResumeBuilder = () => {
     }
 
     const addItem = (section, initial) => {
-        setData({ ...data, [section]: [...data[section], initial] });
+        setData({ ...data, [section]: [...(data[section] || []), initial] });
     }
 
     const removeItem = (section, index) => {
-        const updatedSection = data[section].filter((_, i) => i !== index);
+        const updatedSection = (data[section] || []).filter((_, i) => i !== index);
         setData({ ...data, [section]: updatedSection });
     }
 
@@ -78,7 +165,7 @@ const ResumeBuilder = () => {
         try {
             setAiLoading(true);
             const content = field ? data[section][index][field] : data.personalInfo.summary;
-            const res = await axios.post('https://opportunebridge-backend.onrender.com/api/v1/resume/optimize', {
+            const res = await axios.post(`${RESUME_API_END_POINT}/optimize`, {
                 section,
                 content
             }, { withCredentials: true });
@@ -100,28 +187,68 @@ const ResumeBuilder = () => {
         }
     }
 
-    const saveResume = async () => {
+    const saveResume = async (finish = false) => {
         try {
             setLoading(true);
-            const url = id ? `https://opportunebridge-backend.onrender.com/api/v1/resume/update/${id}` : 'https://opportunebridge-backend.onrender.com/api/v1/resume/create';
+            const url = id ? `${RESUME_API_END_POINT}/update/${id}` : `${RESUME_API_END_POINT}/create`;
             const method = id ? 'put' : 'post';
+            const payload = buildResumePayload(data);
 
-            const res = await axios[method](url, data, { withCredentials: true });
+            const res = await axios[method](url, payload, { withCredentials: true });
             if (res.data.success) {
+                const savedResume = normalizeResumeData(res.data.resume || payload);
+                setData(savedResume);
                 toast.success("Resume saved!");
-                if (!id) navigate('/resumes');
+                if (finish) {
+                    navigate('/resumes');
+                } else if (!id && savedResume._id) {
+                    navigate(`/resume-builder/${savedResume._id}`, { replace: true });
+                }
             }
         } catch (error) {
-            toast.error("Failed to save resume");
+            toast.error(getErrorMessage(error, "Failed to save resume"));
         } finally {
             setLoading(false);
+        }
+    }
+
+    const downloadPDF = async () => {
+        const source = document.getElementById('resume-pdf-source') || document.getElementById('resume-preview-container');
+        if (!source) {
+            toast.error("Resume preview is not ready yet");
+            return;
+        }
+
+        const filename = `${(data.title || 'resume').replace(/[\\/:*?"<>|]+/g, '-').trim() || 'resume'}.pdf`;
+    const opt = {
+            margin: 0,
+            filename,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        let pdfWrapper = null;
+        try {
+            setPdfLoading(true);
+            const html2pdfModule = await import('html2pdf.js');
+            const html2pdf = html2pdfModule.default || html2pdfModule;
+            const { wrapper, clone } = createPdfClone(source);
+            pdfWrapper = wrapper;
+            await new Promise(resolve => requestAnimationFrame(resolve));
+            await html2pdf().set(opt).from(clone).save();
+        } catch (error) {
+            console.error("Failed to generate PDF", error);
+            toast.error("Failed to generate PDF");
+        } finally {
+            pdfWrapper?.remove();
+            setPdfLoading(false);
         }
     }
 
     const checkATS = async () => {
         try {
             setAiLoading(true);
-            const res = await axios.post('https://opportunebridge-backend.onrender.com/api/v1/resume/ats-score', { resumeData: data }, { withCredentials: true });
+            const res = await axios.post(`${RESUME_API_END_POINT}/ats-score`, { resumeData: data }, { withCredentials: true });
             if (res.data.success) {
                 setAtsResult(res.data);
                 setAtsOpen(true);
@@ -137,7 +264,7 @@ const ResumeBuilder = () => {
     const steps = ["Basics", "Experience", "Education", "Projects", "Skills & more"];
 
     return (
-        <div className='min-h-screen bg-gray-50'>
+        <div className='min-h-screen'>
 
             <div className='max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-2 h-[calc(110vh-64px)] overflow-hidden'>
                 {/* Editor Side */}
@@ -156,8 +283,11 @@ const ResumeBuilder = () => {
                             <Button onClick={checkATS} disabled={aiLoading} variant="outline" className="rounded-full border-primary text-primary hover:bg-primary/5">
                                 {aiLoading ? <Loader2 className='mr-2 animate-spin' /> : <Award className='mr-2' />} ATS Check
                             </Button>
-                            <Button onClick={saveResume} disabled={loading} className="rounded-full">
+                            <Button onClick={() => saveResume(false)} disabled={loading} className="rounded-full">
                                 {loading ? <Loader2 className='mr-2 animate-spin' /> : <Save className='mr-2' />} Save
+                            </Button>
+                            <Button onClick={downloadPDF} disabled={pdfLoading} variant="secondary" className="rounded-full">
+                                {pdfLoading ? <Loader2 className='mr-2 animate-spin' /> : <Download className='mr-2' />} PDF
                             </Button>
                         </div>
                     </div>
@@ -333,7 +463,9 @@ const ResumeBuilder = () => {
                             {step < 5 ? (
                                 <Button onClick={() => setStep(s => s + 1)} className="rounded-full px-8">Next <ChevronRight className='ml-2 w-4 h-4' /></Button>
                             ) : (
-                                <Button onClick={saveResume} className="rounded-full px-10 bg-green-600 hover:bg-green-700">Finish & Save</Button>
+                                <Button onClick={() => saveResume(true)} disabled={loading} className="rounded-full px-10 bg-green-600 hover:bg-green-700">
+                                    {loading && <Loader2 className='mr-2 animate-spin' />} Finish & Save
+                                </Button>
                             )}
                         </div>
                     </div>
@@ -344,15 +476,32 @@ const ResumeBuilder = () => {
                     <div className='sticky top-0 mb-6 flex justify-between items-center'>
                         <span className='text-sm font-bold uppercase tracking-widest text-muted-foreground'>Live Preview</span>
                         <div className='flex gap-2 text-xs'>
-                            <Button variant="secondary" size="sm" className="rounded-full" onClick={() => window.print()}><Download className='w-4 h-4 mr-2' /> PDF</Button>
+                            <Button variant="secondary" size="sm" className="rounded-full" onClick={downloadPDF} disabled={pdfLoading}>
+                                {pdfLoading ? <Loader2 className='w-4 h-4 mr-2 animate-spin' /> : <Download className='w-4 h-4 mr-2' />} PDF
+                            </Button>
                         </div>
                     </div>
                     <div className='flex justify-center'>
-                        <div className='w-full max-w-[800px] shadow-2xl origin-top'>
+                        <div id="resume-preview-container" className='w-full max-w-[800px] shadow-2xl origin-top'>
                             <ResumePreview data={data} />
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div
+                id="resume-pdf-source"
+                aria-hidden="true"
+                style={{
+                    position: "fixed",
+                    left: "-10000px",
+                    top: 0,
+                    width: "800px",
+                    background: "#ffffff",
+                    pointerEvents: "none"
+                }}
+            >
+                <ResumePreview data={data} />
             </div>
 
             <Dialog open={atsOpen} onOpenChange={setAtsOpen}>

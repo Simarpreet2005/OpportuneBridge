@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { MOCK_INTERVIEW_API_END_POINT } from '@/utils/constant'
 
 const MockInterviewHome = () => {
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ const MockInterviewHome = () => {
         const fetchInterviews = async () => {
             try {
                 setFetching(true);
-                const res = await axios.get('https://opportunebridge-backend.onrender.com/api/v1/mockinterview/get', { withCredentials: true });
+                const res = await axios.get(`${MOCK_INTERVIEW_API_END_POINT}/get`, { withCredentials: true });
                 if (res.data.success) {
                     setInterviews(res.data.interviews);
                 }
@@ -48,7 +49,7 @@ const MockInterviewHome = () => {
         }
         try {
             setLoading(true);
-            const res = await axios.post('https://opportunebridge-backend.onrender.com/api/v1/mockinterview/start', setupData, { withCredentials: true });
+            const res = await axios.post(`${MOCK_INTERVIEW_API_END_POINT}/start`, setupData, { withCredentials: true });
             if (res.data.success) {
                 navigate(`/mock-interview/session/${res.data.mockInterview._id}`);
             }
@@ -60,7 +61,7 @@ const MockInterviewHome = () => {
     }
 
     return (
-        <div className='min-h-screen bg-gray-50 flex flex-col'>
+        <div className='min-h-screen flex flex-col'>
             <div className='max-w-7xl mx-auto px-4 py-12 flex-1 w-full'>
                 <div className='flex flex-col md:flex-row items-start justify-between mb-12 gap-8'>
                     <div>

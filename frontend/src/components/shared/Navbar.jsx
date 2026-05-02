@@ -49,19 +49,16 @@ const Navbar = () => {
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/superadmin/dashboard">Dashboard</Link></li>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/superadmin/users">Users</Link></li>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/superadmin/analytics">Analytics</Link></li>
-                                    <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/admin/challenges/create">Post Challenge</Link></li>
                                 </>
                             ) : user && user.role === 'recruiter' ? (
                                 <>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/admin/dashboard">Dashboard</Link></li>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/admin/companies">Companies</Link></li>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/admin/jobs">Jobs</Link></li>
-                                    <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/admin/challenges/create">Post Challenge</Link></li>
                                 </>
                             ) : (
                                 <>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/">Home</Link></li>
-                                    <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/challenges">Challenges</Link></li>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/jobs">Find Jobs</Link></li>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/resumes">Resume</Link></li>
                                     <li className='hover:text-primary transition-colors cursor-pointer'><Link to="/interview">Interviews</Link></li>
@@ -157,7 +154,6 @@ const Navbar = () => {
                             ) : (
                                 <>
                                     <Link to="/" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-                                    <Link to="/challenges" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => setIsMobileMenuOpen(false)}>Challenges</Link>
                                     <Link to="/jobs" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => setIsMobileMenuOpen(false)}>Find Jobs</Link>
                                     <Link to="/community" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => setIsMobileMenuOpen(false)}>Community</Link>
                                 </>

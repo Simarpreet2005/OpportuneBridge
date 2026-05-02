@@ -44,7 +44,7 @@ const InterviewHome = () => {
     };
 
     return (
-        <div className='min-h-screen bg-gray-50 flex flex-col'>
+        <div className='min-h-screen flex flex-col'>
             <div className='flex-1 flex items-center justify-center p-4'>
                 <div className='bg-white shadow-2xl rounded-[2.5rem] overflow-hidden max-w-5xl w-full flex flex-col md:flex-row border border-gray-100'>
                     {/* Left Side: Illustration & Branding */}

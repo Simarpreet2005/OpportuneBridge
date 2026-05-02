@@ -5,6 +5,7 @@ import Navbar from '../shared/Navbar'
 import { Button } from '../ui/button'
 import { BrainCircuit, Star, CheckCircle, ChevronLeft, Award, TrendingUp, AlertCircle, Loader2 } from 'lucide-react'
 import Footer from '../shared/Footer'
+import { MOCK_INTERVIEW_API_END_POINT } from '@/utils/constant'
 
 const MockInterviewResult = () => {
     const { id } = useParams();
@@ -15,7 +16,7 @@ const MockInterviewResult = () => {
     useEffect(() => {
         const fetchResult = async () => {
             try {
-                const res = await axios.get(`https://opportunebridge-backend.onrender.com/api/v1/mockinterview/get/${id}`, { withCredentials: true });
+                const res = await axios.get(`${MOCK_INTERVIEW_API_END_POINT}/get/${id}`, { withCredentials: true });
                 if (res.data.success) {
                     setInterview(res.data.interview);
                 }
@@ -32,7 +33,7 @@ const MockInterviewResult = () => {
     if (!interview) return null;
 
     return (
-        <div className='min-h-screen bg-[#f9fafb] flex flex-col'>
+        <div className='min-h-screen flex flex-col'>
             <div className='max-w-5xl mx-auto px-4 py-16 flex-1 w-full'>
                 <Button variant="ghost" className="mb-8 rounded-full" onClick={() => navigate('/mock-interview')}>
                     <ChevronLeft className='mr-2 w-4 h-4' /> Back to Dashboard

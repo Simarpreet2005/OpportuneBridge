@@ -7,6 +7,8 @@ import cloudinary from "../utils/cloudinary.js";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { OAuth2Client } from 'google-auth-library';
+import { Job } from "../models/job.model.js";
+import { generateGeminiText, parseGeminiJson } from "../utils/gemini.js";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const register = async (req, res) => {
@@ -112,7 +114,7 @@ export const login = async (req, res) => {
             profile: user.profile
         }
 
-        return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpsOnly: true, sameSite: 'strict' }).json({
+        return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'lax' }).json({
             message: `Welcome back ${user.fullname}`,
             user,
             success: true
@@ -134,6 +136,16 @@ export const logout = async (req, res) => {
 export const updateProfile = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, bio, skills } = req.body;
+
+        const userId = req.id; // middleware authentication
+        let user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(400).json({
+                message: "User not found.",
+                success: false
+            })
+        }
 
         let files = req.files || {};
         console.log("updateProfile req.body:", req.body);
@@ -169,7 +181,7 @@ export const updateProfile = async (req, res) => {
 
                 // Create new Resume document
                 const newResume = await Resume.create({
-                    user: req.id,
+                    user: userId,
                     title: resumeOriginalName,
                     fileUrl: resumeUrl,
                     personalInfo: {
@@ -195,15 +207,6 @@ export const updateProfile = async (req, res) => {
         let skillsArray;
         if (skills) {
             skillsArray = skills.split(",");
-        }
-        const userId = req.id; // middleware authentication
-        let user = await User.findById(userId);
-
-        if (!user) {
-            return res.status(400).json({
-                message: "User not found.",
-                success: false
-            })
         }
         // updating data
         if (fullname) user.fullname = fullname
@@ -294,10 +297,6 @@ export const getLeaderboard = async (req, res) => {
     }
 }
 
-// Check ATS Score
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Job } from "../models/job.model.js";
-
 export const checkATSScore = async (req, res) => {
     try {
         const { jobId } = req.body;
@@ -310,11 +309,8 @@ export const checkATSScore = async (req, res) => {
             return res.status(404).json({ message: "User or Job not found", success: false });
         }
 
-        const resumeText = user.profile.skills.join(", "); // Fallback if no full text
+        const resumeText = user.profile?.skills?.join(", ") || "Not specified"; // Fallback if no full text
         const jobDescription = job.description;
-
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
         const prompt = `
         Act as an ATS (Applicant Tracking System). 
@@ -331,9 +327,8 @@ export const checkATSScore = async (req, res) => {
         }
         `;
 
-        const result = await model.generateContent(prompt);
-        const responseText = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
-        const atsData = JSON.parse(responseText);
+        const responseText = await generateGeminiText(prompt);
+        const atsData = parseGeminiJson(responseText);
 
         return res.status(200).json({
             success: true,
@@ -468,7 +463,9 @@ export const googleLogin = async (req, res) => {
 
         // Using fetch to get user info from Google UserInfo endpoint
         console.log("Fetching Google user info with token...");
-        const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${googleToken}`);
+        const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo`, {
+            headers: { Authorization: `Bearer ${googleToken}` }
+        });
         const payload = await response.json();
         console.log("Google payload received:", payload?.email ? "Success for " + payload.email : "Failed");
 
@@ -505,7 +502,7 @@ export const googleLogin = async (req, res) => {
             profile: user.profile
         }
 
-        return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpsOnly: true, sameSite: 'strict' }).json({
+        return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'lax' }).json({
             message: `Welcome back ${user.fullname}`,
             user: userResponse,
             success: true

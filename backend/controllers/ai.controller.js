@@ -2,9 +2,7 @@ import { AIMatch } from "../models/aiMatch.model.js";
 import { Challenge } from "../models/challenge.model.js";
 import { Job } from "../models/job.model.js";
 import { User } from "../models/user.model.js";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
+import { generateGeminiText, parseGeminiJson } from "../utils/gemini.js";
 
 export const getMatchScore = async (req, res) => {
     try {
@@ -40,12 +38,10 @@ export const getMatchScore = async (req, res) => {
         let score = 0;
         let analysis = "";
 
-        if (genAI) {
-            try {
-                const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-                const prompt = `Match this user profile against the ${targetType}.
-                User Skills: ${user.profile.skills.join(", ")}
-                User Bio: ${user.profile.bio}
+        try {
+            const prompt = `Match this user profile against the ${targetType}.
+                User Skills: ${user.profile?.skills?.join(", ") || "Not specified"}
+                User Bio: ${user.profile?.bio || "Not specified"}
                 Target Title: ${target.title}
                 Target Description: ${target.description}
                 ${targetType === 'Job' ? `Target Tech Stack: ${target.techStack?.join(", ")}` : ''}
@@ -53,23 +49,13 @@ export const getMatchScore = async (req, res) => {
                 Provide a match score (0-100) and a brief 1-sentence analysis.
                 Format: { "score": number, "analysis": "string" }`;
 
-                const result = await model.generateContent(prompt);
-                const response = await result.response;
-                const text = response.text();
-
-                const jsonMatch = text.match(/\{[\s\S]*\}/);
-                if (!jsonMatch) {
-                    throw new Error("No JSON object found in Gemini response");
-                }
-                const data = JSON.parse(jsonMatch[0]);
-                score = data.score;
-                analysis = data.analysis;
-            } catch (err) {
-                console.error("Gemini Match Error:", err.message);
-                return res.status(500).json({ message: "AI evaluation failed. Please try again later.", success: false });
-            }
-        } else {
-            return res.status(500).json({ message: "AI service not configured.", success: false });
+            const text = await generateGeminiText(prompt);
+            const data = parseGeminiJson(text);
+            score = Math.max(0, Math.min(100, Number(data.score) || 0));
+            analysis = data.analysis || "";
+        } catch (err) {
+            console.error("Gemini Match Error:", err.message);
+            return res.status(500).json({ message: "AI evaluation failed. Please try again later.", success: false });
         }
 
         const newMatch = await AIMatch.create({

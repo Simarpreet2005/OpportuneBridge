@@ -55,10 +55,10 @@
   --popover: #FFFFFF;
   --popover-foreground: #1F2937;
 
-  --primary: #1E3A8A;
+  --primary: #4A6CF7;
   --primary-foreground: #FFFFFF;
-  --primary-light: #3B82F6;
-  --primary-lighter: #DBEAFE;
+  --primary-light: #7A94FF;
+  --primary-lighter: #E0E8FF;
 
   --secondary: #F3F4F6;
   --secondary-foreground: #1F2937;
@@ -97,10 +97,10 @@
   --sidebar-border: #E5E7EB;
   --sidebar-ring: #3B82F6;
 
-  --gradient-primary: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+  --gradient-primary: linear-gradient(135deg, #4A6CF7 0%, #7A94FF 100%);
   --gradient-accent: linear-gradient(135deg, #FB923C 0%, #F97316 100%);
   --gradient-success: linear-gradient(135deg, #6EE7B7 0%, #34D399 100%);
-  --gradient-hero: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 50%, #BFDBFE 100%);
+  --gradient-hero: linear-gradient(135deg, #F0F4FF 0%, #E0E8FF 50%, #C2D3FF 100%);
 
   --shadow-sm: 0 1px 2px 0 rgba(30, 58, 138, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(30, 58, 138, 0.08), 0 2px 4px -1px rgba(30, 58, 138, 0.04);
@@ -173,7 +173,8 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply text-foreground antialiased;
+    background: var(--gradient-hero);
     font-feature-settings: "kern" 1, "liga" 1;
   }
 

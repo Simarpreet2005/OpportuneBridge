@@ -13,9 +13,6 @@ import Browse from "./components/Browse"
 import Profile from "./components/Profile"
 import JobDescription from "./components/JobDescription"
 import CommunityFeed from "./components/community/CommunityFeed"
-import Challenges from "./pages/Challenges"
-import ChallengeSpace from "./components/challenge/ChallengeSpace"
-
 import ResumeList from "./components/resume/ResumeList"
 import ResumeBuilder from "./components/resume/ResumeBuilder"
 import InterviewHome from "./components/interview/InterviewHome"
@@ -36,8 +33,6 @@ import ProtectedRoute from "./components/admin/ProtectedRoute"
 import SuperAdminDashboard from "./components/admin/SuperAdminDashboard"
 import SuperAdminUsers from "./components/admin/SuperAdminUsers"
 import SuperAdminAnalytics from "./components/admin/SuperAdminAnalytics"
-import CreateChallenge from "./components/admin/CreateChallenge"
-
 import Chatbot from "./components/Chatbot"
 import Dashboard from "./pages/Dashboard"
 
@@ -68,9 +63,6 @@ const appRouter = createBrowserRouter([
       { path: "/jobs/:id", element: <JobDescription /> },
 
       { path: "/community", element: <CommunityFeed /> },
-      { path: "/challenges", element: <Challenges /> },
-      { path: "/challenge/:id", element: <ChallengeSpace /> },
-
       { path: "/resumes", element: <ResumeList /> },
       { path: "/resume-builder", element: <ResumeBuilder /> },
       { path: "/resume-builder/:id", element: <ResumeBuilder /> },
@@ -147,14 +139,6 @@ const appRouter = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Applicants />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: "/admin/challenges/create",
-        element: (
-          <ProtectedRoute>
-            <CreateChallenge />
           </ProtectedRoute>
         )
       },

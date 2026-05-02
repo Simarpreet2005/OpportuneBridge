@@ -1,6 +1,5 @@
 
-import React, { useEffect, useState } from 'react'
-import Navbar from '../shared/Navbar'
+import React, { useState } from 'react'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { RadioGroup } from '../ui/radio-group'
@@ -21,7 +20,7 @@ const Login = () => {
         role: "",
     });
     const [showPassword, setShowPassword] = useState(false);
-    const { loading, user } = useSelector(store => store.auth);
+    const { loading } = useSelector(store => store.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -83,10 +82,14 @@ const Login = () => {
 
     return (
         <div>
-            <div className='flex items-center justify-center max-w-7xl mx-auto'>
-                <form onSubmit={submitHandler} className='w-full max-w-md border border-gray-200 rounded-md p-4 my-10'>
-                    <h1 className='font-bold text-xl mb-5'>Login</h1>
-                    <div className='my-2'>
+            <div className='min-h-screen flex items-center justify-center p-6'>
+                <form onSubmit={submitHandler} className='w-full max-w-md bg-white/90 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-10 my-12'>
+                    <div className='text-center mb-10'>
+                        <h1 className='font-bold text-3xl text-gray-900'>Login</h1>
+                        <p className='text-gray-500 text-sm mt-2'>Welcome back to OpportuneBridge</p>
+                    </div>
+                    <div className='space-y-5'>
+                        <div>
                         <Label>Email</Label>
                         <Input
                             type="email"
@@ -95,9 +98,8 @@ const Login = () => {
                             onChange={changeEventHandler}
                             placeholder="example@gmail.com"
                         />
-                    </div>
-
-                    <div className='my-2'>
+                        </div>
+                        <div>
                         <Label>Password</Label>
                         <div className='relative'>
                             <Input
@@ -117,47 +119,51 @@ const Login = () => {
                         </div>
                         <div className='text-right mt-1'>
                             <Link to="/forgot-password" size="sm" className='text-sm text-blue-600 hover:underline'>Forgot Password?</Link>
+                            </div>
                         </div>
                     </div>
-                    <div className='flex items-center justify-between'>
+                    <div className='flex items-center justify-between mt-8 mb-3'>
                         <RadioGroup className="flex items-center gap-4 my-5">
                             <div className="flex items-center space-x-2">
-                                <Input
+                                <input
                                     type="radio"
                                     name="role"
+                                    id="r1"
                                     value="student"
                                     checked={input.role === 'student'}
                                     onChange={changeEventHandler}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer w-4 h-4 accent-blue-600"
                                 />
                                 <Label htmlFor="r1">Student</Label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <Input
+                                <input
                                     type="radio"
                                     name="role"
+                                    id="r2"
                                     value="recruiter"
                                     checked={input.role === 'recruiter'}
                                     onChange={changeEventHandler}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer w-4 h-4 accent-blue-600"
                                 />
                                 <Label htmlFor="r2">Recruiter (Admin)</Label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <Input
+                                <input
                                     type="radio"
                                     name="role"
+                                    id="r3"
                                     value="superadmin"
                                     checked={input.role === 'superadmin'}
                                     onChange={changeEventHandler}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer w-4 h-4 accent-blue-600"
                                 />
                                 <Label htmlFor="r3">Super Admin</Label>
                             </div>
                         </RadioGroup>
                     </div>
                     {
-                        loading ? <Button className="w-full my-4"> <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please wait </Button> : <Button type="submit" className="w-full my-4">Login</Button>
+                        loading ? <Button className="w-full my-5"> <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please wait </Button> : <Button type="submit" className="w-full my-5">Login</Button>
                     }
                     <div className='flex items-center gap-2 my-2'>
                         <div className='flex-1 h-[1px] bg-gray-300'></div>

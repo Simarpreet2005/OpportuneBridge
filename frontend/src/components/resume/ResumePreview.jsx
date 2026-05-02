@@ -146,7 +146,7 @@ const ResumePreview = ({ data }) => {
     )
 
     return (
-        <div id="resume-preview-container">
+        <div>
             {templateId === 'modern' ? <ModernTemplate /> : <ModernTemplate />}
         </div>
     )

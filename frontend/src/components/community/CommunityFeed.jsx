@@ -185,7 +185,7 @@ const CommunityFeed = () => {
     }
 
     return (
-        <div className='bg-background min-h-screen'>
+        <div className='min-h-screen'>
             <div className='max-w-3xl mx-auto px-4 py-8'>
                 <h1 className='text-3xl font-bold mb-6'>Community Feed</h1>
 

@@ -6,6 +6,7 @@ import { Editor as MonacoEditor } from '@monaco-editor/react'
 import { Button } from '../ui/button'
 import { ChevronRight, ChevronLeft, Send, Loader2, Code2, BrainCircuit, Timer, MessageSquareText } from 'lucide-react'
 import Navbar from '../shared/Navbar'
+import { MOCK_INTERVIEW_API_END_POINT } from '@/utils/constant'
 
 const MockInterviewSession = () => {
     const { id } = useParams();
@@ -20,7 +21,7 @@ const MockInterviewSession = () => {
         const fetchInterview = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get(`https://opportunebridge-backend.onrender.com/api/v1/mockinterview/get/${id}`, { withCredentials: true });
+                const res = await axios.get(`${MOCK_INTERVIEW_API_END_POINT}/get/${id}`, { withCredentials: true });
                 if (res.data.success) {
                     setInterview(res.data.interview);
                 }
@@ -45,7 +46,7 @@ const MockInterviewSession = () => {
                 answer: answers[idx]
             }));
 
-            const res = await axios.post('https://opportunebridge-backend.onrender.com/api/v1/mockinterview/submit', {
+            const res = await axios.post(`${MOCK_INTERVIEW_API_END_POINT}/submit`, {
                 interviewId: id,
                 answers: formattedAnswers
             }, { withCredentials: true });
@@ -67,7 +68,7 @@ const MockInterviewSession = () => {
     const currentQuestion = interview.questions[currentQuestionIndex];
 
     return (
-        <div className='h-screen flex flex-col bg-[#f8f9fc]'>
+        <div className='h-screen flex flex-col'>
             <div className='flex-1 flex overflow-hidden'>
                 {/* Left: Questions & Navigation */}
                 <div className='w-1/3 bg-white border-r border-gray-200 flex flex-col shadow-2xl z-10'>

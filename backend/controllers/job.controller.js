@@ -1,25 +1,55 @@
 import { Job } from "../models/job.model.js";
 import { User } from "../models/user.model.js";
 
+const parseSalaryValue = (salary) => {
+    if (salary === undefined || salary === null || salary === "") return NaN;
+    if (typeof salary === "number") return Number.isFinite(salary) ? salary : NaN;
+    const cleaned = String(salary).trim().replace(/,/g, "");
+    const n = parseFloat(cleaned);
+    return Number.isFinite(n) ? n : NaN;
+};
+
 export const postJob = async (req, res) => {
     try {
         const { title, description, requirements, salary, location, jobType, opportunityType, experience, position, companyId } = req.body;
         const userId = req.id;
 
-        if (!title || !description || !requirements || !salary || !location || !jobType || !experience || position === undefined || !companyId) {
+        const reqStr = requirements !== undefined && requirements !== null ? String(requirements).trim() : "";
+        const parsedSalary = parseSalaryValue(salary);
+        const parsedPosition = Number(position);
+
+        if (!title?.trim() || !description?.trim() || !reqStr || !location?.trim() || !jobType?.trim() || !experience?.trim()) {
             return res.status(400).json({
                 message: "Something is missing.",
                 success: false
             })
         };
 
-        const parsedSalary = Number(salary);
-        const parsedPosition = Number(position);
+        if (!Number.isFinite(parsedSalary) || parsedSalary < 0) {
+            return res.status(400).json({
+                message: "Enter a valid salary (numeric amount, e.g. 12 or 12.5).",
+                success: false
+            })
+        }
+
+        if (!Number.isFinite(parsedPosition) || parsedPosition < 1) {
+            return res.status(400).json({
+                message: "Enter a valid number of positions (at least 1).",
+                success: false
+            })
+        }
+
+        if (!companyId) {
+            return res.status(400).json({
+                message: "Please select a company.",
+                success: false
+            })
+        }
 
         const job = await Job.create({
-            title,
-            description,
-            requirements: requirements.split(","),
+            title: title.trim(),
+            description: description.trim(),
+            requirements: reqStr.split(",").map((r) => r.trim()).filter(Boolean),
             salary: parsedSalary,
             location,
             jobType,
