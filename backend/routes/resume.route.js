@@ -1,15 +1,16 @@
 import express from "express";
-import isAuthenticated from "../middlewares/isAuthenticated.js";
-import { createResume, deleteResume, getResumeById, getResumes, optimizeResumeAI, updateResume, calculateATSScore } from "../controllers/resume.controller.js";
+import isAuthenticated from "../middleware/isAuthenticated.js";
+import { uploadResumeVersionController, getResumeVersionsController, setActiveResumeVersionController, deleteResumeVersionController, getActiveResumeVersionController } from "../controllers/resumeVersion.controller.js";
+import asyncHandler from "../middleware/asyncHandler.js";
+import { singleUpload } from "../middleware/multer.js";
 
 const router = express.Router();
 
-router.route("/create").post(isAuthenticated, createResume);
-router.route("/update/:id").put(isAuthenticated, updateResume);
-router.route("/get").get(isAuthenticated, getResumes);
-router.route("/get/:id").get(isAuthenticated, getResumeById);
-router.route("/delete/:id").delete(isAuthenticated, deleteResume);
-router.route("/optimize").post(isAuthenticated, optimizeResumeAI);
-router.route("/ats-score").post(isAuthenticated, calculateATSScore);
+// New resume version tracking routes
+router.route("/upload-version").post(isAuthenticated, singleUpload, asyncHandler(uploadResumeVersionController));
+router.route("/versions").get(isAuthenticated, asyncHandler(getResumeVersionsController));
+router.route("/set-active/:versionId").patch(isAuthenticated, asyncHandler(setActiveResumeVersionController));
+router.route("/version/:versionId").delete(isAuthenticated, asyncHandler(deleteResumeVersionController));
+router.route("/active-version").get(isAuthenticated, asyncHandler(getActiveResumeVersionController));
 
 export default router;

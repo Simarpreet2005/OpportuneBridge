@@ -2,21 +2,36 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
-import { Toaster } from './components/ui/sonner.jsx'
+import { Toaster } from './ui/sonner.jsx'
 import { Provider } from 'react-redux'
-import store from './redux/store.js'
+import { QueryClientProvider } from '@tanstack/react-query'
+import store from './store/store.js'
+import queryClient from './services/queryClient.js'
 import { persistStore } from 'redux-persist'
 import { PersistGate } from 'redux-persist/integration/react'
 
 const persistor = persistStore(store);
 
+const applyInitialTheme = () => {
+  try {
+    const stored = localStorage.getItem("theme"); // "light" | "dark" | null
+    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
+    const useDark = stored ? stored === "dark" : !!prefersDark;
+    document.documentElement.classList.toggle("dark", useDark);
+  } catch {
+    // ignore
+  }
+};
+
+applyInitialTheme();
+
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  <QueryClientProvider client={queryClient}>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <App />
         <Toaster />
       </PersistGate>
     </Provider>
-  </React.StrictMode>,
+  </QueryClientProvider>
 )

@@ -20,8 +20,12 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['student', 'recruiter', 'superadmin'],
+    enum: ['student', 'recruiter', 'admin', 'superadmin'],
     required: true
+  },
+  isSuspended: {
+    type: Boolean,
+    default: false
   },
   profile: {
     bio: { type: String },

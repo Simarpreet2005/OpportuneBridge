@@ -1,23 +1,23 @@
 # 🌉 OpportuneBridge
 
-**OpportuneBridge** is a modern, AI-powered career platform designed to bridge the gap between ambitious talent and top-tier employers. Built with the **MERN Stack** (MongoDB, Express, React, Node.js), it offers a seamless experience for job seekers, recruiters, and administrators.
+**OpportuneBridge** is a career platform designed to bridge the gap between talent and employers. Built with the **MERN Stack** (MongoDB, Express, React, Node.js), it provides a platform for job seekers, recruiters, and administrators.
 
 ## 🚀 Key Features
 
 ### 👤 User Roles
-- **Students**: Browse and apply for jobs, build resumes, and practice with AI.
+- **Students**: Browse and apply for jobs, build resumes, and access career guidance.
 - **Recruiters**: Post jobs, manage applications, and view candidate profiles.
 - **Admins**: Monitor platform analytics, manage companies, and oversee users.
 
-### 🤖 AI-Powered Tools (Powered by Gemini)
-- **Mock Interviews**: Real-time AI interview sessions with instant feedback on answers and code.
-- **Resume Builder**: Smart suggestions to craft the perfect resume.
-- **AI Chatbot**: Intelligent assistant to guide users through the platform.
+### 🤖 AI-Powered Tools
+- **Career Assistant**: AI-powered chatbot for career guidance, resume tips, and interview preparation (powered by Groq API with Llama-3.1-8B-Instant model)
+- **Candidate Ranking**: AI-assisted candidate scoring for recruiters based on skills, experience, and profile completeness. Falls back to algorithmic scoring if AI is unavailable.
 
 ### 💼 Job Portal Core
-- **Advanced Search**: Filter jobs by location, role, and salary.
-- **Application Tracking**: Real-time status updates on applied jobs.
-- **Company Pages**: Detailed company profiles and open positions.
+- **Job Search**: Filter jobs by location, role, and salary.
+- **Application Tracking**: Track status of job applications.
+- **Company Profiles**: View company information and posted positions.
+- **Resume Management**: Upload and manage multiple resume versions using Cloudinary.
 
 ---
 
@@ -26,9 +26,12 @@
 - **Frontend**: React (Vite), Redux Toolkit, Tailwind CSS, Shadcn UI
 - **Backend**: Node.js, Express.js
 - **Database**: MongoDB (Mongoose)
-- **AI Integration**: Google Gemini API
+- **AI Integration**: Groq API (Llama-3.1-8B-Instant) for career assistance and candidate ranking
 - **Authentication**: JWT, Google OAuth (React OAuth Google)
-- **File Storage**: Cloudinary (for resumes & profile pics)
+- **File Storage**: Cloudinary (for resumes & profile photos)
+- **Email**: Nodemailer for email notifications
+- **Logging**: Custom logger utility for structured logging
+- **Environment Validation**: Centralized environment variable validation
 
 ---
 
@@ -40,7 +43,7 @@ Follow these steps to get the project running locally.
 - [Node.js](https://nodejs.org/) (v16+)
 - [MongoDB](https://www.mongodb.com/) (Local or Atlas)
 - [Cloudinary Account](https://cloudinary.com/)
-- [Google Gemini API Key](https://ai.google.dev/)
+- [Groq API Key](https://console.groq.com/)
 
 ### 2. Clone the Repository
 ```bash
@@ -59,14 +62,18 @@ Create a `.env` file in the `backend` directory:
 ```env
 MONGO_URI=your_mongodb_connection_string
 PORT=8000
-SECRET_KEY=your_jwt_secret
-CLOUD_NAME=your_cloudinary_name
-API_KEY=your_cloudinary_api_key
-API_SECRET=your_cloudinary_api_secret
-GEMINI_API_KEY=your_gemini_api_key
+JWT_SECRET=your_jwt_secret
+CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+GROQ_API_KEY=your_groq_api_key
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_email_app_password
 GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+FRONTEND_URL=http://localhost:5173
 ```
 
 Start the backend server:
@@ -97,14 +104,65 @@ To create the super admin account, run the seed script:
 cd backend
 node seedSuperAdmin.js
 ```
-fixed credentials: 
 
-⦁	Email: admin@opportunebridge.com
-⦁	Password: Admin@123
+⦁	Email: [configured in seed script]
+⦁	Password: [configured in seed script]
 
 ### 6. Access the App
 Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal).
-Live Link: https://opportunebridge-frontend.onrender.com
+
+---
+
+## 🏗️ Architecture
+
+### Backend Structure
+- **Controllers**: Handle HTTP requests and business logic
+- **Models**: Mongoose schemas for MongoDB (User, Job, Application, Company)
+- **Services**: Business logic layer (candidate ranking, career assistant)
+- **Middleware**: Authentication, error handling, admin verification
+- **Utils**: Logger, environment validation, helper functions
+
+### Frontend Structure
+- **Components**: Reusable UI components using Shadcn UI
+- **Context**: Authentication context for global state
+- **Services**: API client for backend communication
+- **Store**: Redux Toolkit for state management
+- **Constants**: API endpoints and configuration
+
+### Key Implementation Details
+- **Candidate Ranking**: Algorithmic scoring based on skills match (60%), experience (20%), education (10%), and profile completeness (10%). AI enhancement via Groq API is optional and falls back gracefully.
+- **Career Assistant**: Enforces career-related queries only. Non-career questions are declined by the AI.
+- **Authentication**: JWT tokens for session management, Google OAuth for social login
+- **File Uploads**: Cloudinary integration for resume and profile photo storage
+- **Error Handling**: Centralized error middleware with structured logging
+
+---
+
+## 🚀 Deployment
+
+### Backend Deployment (Vercel/Render)
+1. Push your code to GitHub
+2. Connect your repository to Vercel or Render
+3. Set environment variables in the deployment platform:
+   - `MONGO_URI`
+   - `JWT_SECRET`
+   - `CLOUDINARY_CLOUD_NAME`
+   - `CLOUDINARY_API_KEY`
+   - `CLOUDINARY_API_SECRET`
+   - `GROQ_API_KEY`
+   - `EMAIL_HOST`
+   - `EMAIL_PORT`
+   - `EMAIL_USER`
+   - `EMAIL_PASS`
+   - `GOOGLE_CLIENT_ID`
+4. Deploy the backend
+
+### Frontend Deployment (Vercel)
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Set environment variable:
+   - `VITE_API_URL` (your deployed backend URL)
+4. Deploy the frontend
 
 ---
 

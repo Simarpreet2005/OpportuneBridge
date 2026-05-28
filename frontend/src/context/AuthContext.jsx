@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "@/redux/authSlice";
+import { setUser } from "../store/authSlice";
 
 export const AuthContext = createContext();
 

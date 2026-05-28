@@ -1,6 +1,7 @@
 import { Company } from "../models/company.model.js";
-import getDataUri from "../utils/datauri.js";
-import cloudinary from "../utils/cloudinary.js";
+import { logger } from "../utils/logger.js";
+import { errorResponse } from "../utils/apiResponse.js";
+import { uploadProfilePhoto } from "../services/fileUpload.service.js";
 
 export const registerCompany = async (req, res) => {
     try {
@@ -29,25 +30,21 @@ export const registerCompany = async (req, res) => {
             success: true
         })
     } catch (error) {
-        console.log(error);
+        logger.error("Company Controller Error", { error: error.message, stack: error.stack });
+        return errorResponse(res, 500, "Internal server error", error.message);
     }
 }
 export const getCompany = async (req, res) => {
     try {
         const userId = req.id;
         const companies = await Company.find({ userId });
-        if (!companies) {
-            return res.status(404).json({
-                message: "Companies not found.",
-                success: false
-            })
-        }
         return res.status(200).json({
             companies,
             success: true
         })
     } catch (error) {
-        console.log(error);
+        logger.error("Company Controller Error", { error: error.message, stack: error.stack });
+        return errorResponse(res, 500, "Internal server error", error.message);
     }
 }
 
@@ -66,19 +63,35 @@ export const getCompanyById = async (req, res) => {
             success: true
         })
     } catch (error) {
-        console.log(error);
+        logger.error("Company Controller Error", { error: error.message, stack: error.stack });
+        return errorResponse(res, 500, "Internal server error", error.message);
     }
 }
 export const updateCompany = async (req, res) => {
     try {
         const { name, description, website, location } = req.body;
 
-        const file = req.file;
+        logger.info("updateCompany request received", { 
+            companyId: req.params.id, 
+            hasFile: !!req.file,
+            name, 
+            description, 
+            website, 
+            location 
+        });
+
         let logo;
-        if (file) {
-            const fileUri = getDataUri(file);
-            const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-            logo = cloudResponse.secure_url;
+        if (req.file) {
+            try {
+                logo = await uploadProfilePhoto(req.file);
+                logger.info("Company logo uploaded successfully", { url: logo });
+            } catch (uploadError) {
+                logger.error("Company logo upload failed", { error: uploadError.message });
+                return res.status(400).json({
+                    message: `Logo upload failed: ${uploadError.message}`,
+                    success: false
+                });
+            }
         }
 
         const updateData = { name, description, website, location };
@@ -86,24 +99,30 @@ export const updateCompany = async (req, res) => {
             updateData.logo = logo;
         }
 
-        const company = await Company.findByIdAndUpdate(req.params.id, updateData, { new: true });
+        const isPrivileged = req.user?.role === "admin" || req.user?.role === "superadmin";
+        const companyQuery = isPrivileged ? { _id: req.params.id } : { _id: req.params.id, userId: req.id };
+
+        const company = await Company.findOneAndUpdate(companyQuery, updateData, { new: true });
 
         if (!company) {
+            logger.warn("Company not found for update", { companyId: req.params.id, isPrivileged });
             return res.status(404).json({
                 message: "Company not found.",
                 success: false
             })
         }
+
+        logger.info("Company updated successfully", { companyId: company._id });
+
         return res.status(200).json({
             message: "Company information updated.",
             success: true
         })
 
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            message: "An error occurred while updating the company.",
-            success: false
-        })
+        logger.error("updateCompany error", { error: error.message, stack: error.stack });
+        return errorResponse(res, 500, "Internal server error");
     }
 }
+
+

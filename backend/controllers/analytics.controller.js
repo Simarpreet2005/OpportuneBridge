@@ -1,7 +1,8 @@
 import { Application } from "../models/application.model.js";
 import { Job } from "../models/job.model.js";
 import { Company } from "../models/company.model.js";
-import { User } from "../models/user.model.js";
+import { logger } from "../utils/logger.js";
+import { errorResponse } from "../utils/apiResponse.js";
 
 export const getRecruiterAnalytics = async (req, res) => {
     try {
@@ -123,11 +124,8 @@ export const getRecruiterAnalytics = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Analytics Error:", error);
-        return res.status(500).json({
-            message: "Failed to fetch analytics",
-            success: false
-        });
+        logger.error("Analytics Error", { error: error.message });
+        return errorResponse(res, 500, "Internal server error");;
     }
 };
 
@@ -179,10 +177,9 @@ export const getJobAnalytics = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Job Analytics Error:", error);
-        return res.status(500).json({
-            message: "Failed to fetch job analytics",
-            success: false
-        });
+        logger.error("Analytics Error", { error: error.message });
+        return errorResponse(res, 500, "Internal server error");;
     }
 };
+
+

@@ -1,46 +1,46 @@
+import { lazy, Suspense } from "react"
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom"
 import { AuthProvider } from "./context/AuthContext"
 
-import Navbar from "./components/shared/Navbar"
+import Navbar from "./layout/Navbar"
+import ErrorBoundary from "./ui/ErrorBoundary"
+import RouteFallback from "./ui/RouteFallback"
 
-import Login from "./components/auth/Login"
-import Signup from "./components/auth/Signup"
-import ForgotPassword from "./components/auth/ForgotPassword"
-import ResetPassword from "./components/auth/ResetPassword"
-import Home from "./components/Home"
-import Jobs from "./components/Jobs"
-import Browse from "./components/Browse"
-import Profile from "./components/Profile"
-import JobDescription from "./components/JobDescription"
-import CommunityFeed from "./components/community/CommunityFeed"
-import ResumeList from "./components/resume/ResumeList"
-import ResumeBuilder from "./components/resume/ResumeBuilder"
-import InterviewHome from "./components/interview/InterviewHome"
-import InterviewRoom from "./components/interview/InterviewRoom"
+const Login = lazy(() => import("./pages/auth/Login"))
+const Signup = lazy(() => import("./pages/auth/Signup"))
+const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"))
+const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"))
+const Home = lazy(() => import("./pages/Home"))
+const Jobs = lazy(() => import("./jobs/Jobs"))
+const Browse = lazy(() => import("./jobs/Browse"))
+const Profile = lazy(() => import("./pages/Profile"))
+const JobDescription = lazy(() => import("./jobs/JobDescription"))
 
-import MockInterviewHome from "./components/mockInterview/MockInterviewHome"
-import MockInterviewSession from "./components/mockInterview/MockInterviewSession"
-import MockInterviewResult from "./components/mockInterview/MockInterviewResult"
-
-import Companies from "./components/admin/Companies"
-import CompanyCreate from "./components/admin/CompanyCreate"
-import CompanySetup from "./components/admin/CompanySetup"
-import AdminDashboard from "./components/admin/AdminDashboard"
-import AdminJobs from "./components/admin/AdminJobs"
-import PostJob from "./components/admin/PostJob"
-import Applicants from "./components/admin/Applicants"
-import ProtectedRoute from "./components/admin/ProtectedRoute"
-import SuperAdminDashboard from "./components/admin/SuperAdminDashboard"
-import SuperAdminUsers from "./components/admin/SuperAdminUsers"
-import SuperAdminAnalytics from "./components/admin/SuperAdminAnalytics"
-import Chatbot from "./components/Chatbot"
-import Dashboard from "./pages/Dashboard"
+const Companies = lazy(() => import("./pages/admin/Companies"))
+const CompanyCreate = lazy(() => import("./pages/admin/CompanyCreate"))
+const CompanySetup = lazy(() => import("./pages/admin/CompanySetup"))
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"))
+const AdminJobs = lazy(() => import("./pages/admin/AdminJobs"))
+const PostJob = lazy(() => import("./pages/admin/PostJob"))
+const Applicants = lazy(() => import("./pages/admin/Applicants"))
+const ProtectedRoute = lazy(() => import("./pages/admin/ProtectedRoute"))
+const SuperAdminDashboard = lazy(() => import("./pages/admin/SuperAdminDashboard"))
+const SuperAdminUsers = lazy(() => import("./pages/admin/SuperAdminUsers"))
+const SuperAdminAnalytics = lazy(() => import("./pages/admin/SuperAdminAnalytics"))
+const Dashboard = lazy(() => import("./pages/Dashboard"))
+const StudentDashboard = lazy(() => import("./pages/student/StudentDashboard"))
+const CareerAssistant = lazy(() => import("./components/CareerAssistant"))
+const SavedJobs = lazy(() => import("./pages/student/SavedJobs"))
 
 const Layout = () => {
   return (
     <>
       <Navbar />
-      <Outlet />
+      <ErrorBoundary>
+        <Suspense fallback={<RouteFallback />}>
+          <Outlet />
+        </Suspense>
+      </ErrorBoundary>
     </>
   )
 }
@@ -56,28 +56,19 @@ const appRouter = createBrowserRouter([
       { path: "/reset-password/:token", element: <ResetPassword /> },
 
       { path: "/", element: <Home /> },
-      { path: "/dashboard", element: <Dashboard /> },
       { path: "/jobs", element: <Jobs /> },
       { path: "/browse", element: <Browse /> },
-      { path: "/profile", element: <Profile /> },
       { path: "/jobs/:id", element: <JobDescription /> },
 
-      { path: "/community", element: <CommunityFeed /> },
-      { path: "/resumes", element: <ResumeList /> },
-      { path: "/resume-builder", element: <ResumeBuilder /> },
-      { path: "/resume-builder/:id", element: <ResumeBuilder /> },
-
-      { path: "/interview", element: <InterviewHome /> },
-      { path: "/interview/room/:id", element: <InterviewRoom /> },
-
-      { path: "/mock-interview", element: <MockInterviewHome /> },
-      { path: "/mock-interview/session/:id", element: <MockInterviewSession /> },
-      { path: "/mock-interview/result/:id", element: <MockInterviewResult /> },
+      { path: "/dashboard", element: <ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute> },
+      { path: "/profile", element: <ProtectedRoute allowedRoles={['student', 'recruiter', 'admin', 'superadmin']}><Profile /></ProtectedRoute> },
+      { path: "/career-assistant", element: <ProtectedRoute allowedRoles={['student']}><CareerAssistant /></ProtectedRoute> },
+      { path: "/saved-jobs", element: <ProtectedRoute allowedRoles={['student']}><SavedJobs /></ProtectedRoute> },
 
       {
         path: "/admin/dashboard",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['recruiter', 'admin', 'superadmin']}>
             <AdminDashboard />
           </ProtectedRoute>
         )
@@ -97,7 +88,7 @@ const appRouter = createBrowserRouter([
       {
         path: "/admin/companies",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['recruiter', 'admin', 'superadmin']}>
             <Companies />
           </ProtectedRoute>
         )
@@ -105,7 +96,7 @@ const appRouter = createBrowserRouter([
       {
         path: "/admin/companies/create",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['recruiter', 'admin', 'superadmin']}>
             <CompanyCreate />
           </ProtectedRoute>
         )
@@ -113,7 +104,7 @@ const appRouter = createBrowserRouter([
       {
         path: "/admin/companies/:id",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['recruiter', 'admin', 'superadmin']}>
             <CompanySetup />
           </ProtectedRoute>
         )
@@ -121,7 +112,7 @@ const appRouter = createBrowserRouter([
       {
         path: "/admin/jobs",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['recruiter', 'admin', 'superadmin']}>
             <AdminJobs />
           </ProtectedRoute>
         )
@@ -129,7 +120,7 @@ const appRouter = createBrowserRouter([
       {
         path: "/admin/jobs/create",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['recruiter', 'admin', 'superadmin']}>
             <PostJob />
           </ProtectedRoute>
         )
@@ -137,7 +128,7 @@ const appRouter = createBrowserRouter([
       {
         path: "/admin/jobs/:id/applicants",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['recruiter', 'admin', 'superadmin']}>
             <Applicants />
           </ProtectedRoute>
         )
@@ -154,7 +145,6 @@ function App() {
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <AuthProvider>
         <RouterProvider router={appRouter} />
-        <Chatbot />
       </AuthProvider>
     </GoogleOAuthProvider>
   )

@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import api from "../api";
-import ResumeUploader from "../components/ResumeUploader";
-import ProfilePicUploader from "../components/ProfilePicUploader";
+import ResumeUploader from "./ResumeUploader";
+import ProfilePicUploader from "./ProfilePicUploader";
 
 export default function Dashboard() {
     const { user, setUser } = useContext(AuthContext);
@@ -19,10 +19,10 @@ export default function Dashboard() {
             }
         }
         load();
-    }, [setUser]);
+    }, []);
 
     return (
-        <div className="p-10">
+        <div className="page-container page-padding">
             <h1 className="text-2xl font-bold mb-4">Welcome {user?.fullname}</h1>
 
             <div className="mb-8">
@@ -35,15 +35,15 @@ export default function Dashboard() {
 
             <div className="mb-8">
                 <h2 className="text-xl font-semibold mb-2">Upload Resume</h2>
-                <ResumeUploader setResumes={setResumes} />
+                <ResumeUploader setResumes={setResumes} setUser={setUser} />
             </div>
 
             <div>
                 <h2 className="text-xl font-semibold mb-2">My Resumes</h2>
                 <ul className="space-y-2">
                     {resumes.map((r) => (
-                        <li key={r._id} className="p-4 border rounded shadow-sm bg-white">
-                            <a href={r.fileUrl || r.url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                        <li key={r._id} className="p-4 border border-border rounded-xl shadow-card bg-card">
+                            <a href={r.fileUrl || r.url} target="_blank" rel="noreferrer" className="text-primary hover:underline">
                                 View Resume {r.originalFileName || "File"}
                             </a>
                         </li>
@@ -53,3 +53,4 @@ export default function Dashboard() {
         </div>
     );
 }
+
