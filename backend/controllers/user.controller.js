@@ -141,7 +141,7 @@ export const login = async (req, res) => {
         const cookieOptions = {
             maxAge: 1 * 24 * 60 * 60 * 1000,
             httpOnly: true,
-            sameSite: 'lax',
+            sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
             secure: process.env.NODE_ENV === "production"
         };
 
@@ -160,7 +160,7 @@ export const logout = async (req, res) => {
         const cookieOptions = {
             maxAge: 0,
             httpOnly: true,
-            sameSite: 'lax',
+            sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
             secure: process.env.NODE_ENV === "production"
         };
 
@@ -423,7 +423,7 @@ export const googleLogin = async (req, res) => {
         const cookieOptions = {
             maxAge: 1 * 24 * 60 * 60 * 1000,
             httpOnly: true,
-            sameSite: 'lax',
+            sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
             secure: process.env.NODE_ENV === "production"
         };
 
