@@ -185,7 +185,7 @@ export const generateCandidateRanking = async (candidate, job) => {
             strengths = aiResponse.strengths || [];
             improvementSuggestions = aiResponse.improvement_suggestions || [];
         } catch (error) {
-            logger.error("Groq AI ranking enhancement error", { error: error.message, stack: error.stack });
+            logger.warn("Groq AI ranking enhancement error", { error: error.message });
         }
     }
 

@@ -148,12 +148,16 @@ const Applicants = () => {
                 </div>
 
                 {viewMode === 'all' ? (
-                    <ApplicantsTable />
+                    <div className="bg-card rounded-xl border shadow-sm p-4 mt-6">
+                        <ApplicantsTable />
+                    </div>
                 ) : (
                     loadingRanked ? (
                         <div className="flex justify-center p-8 text-muted-foreground">Loading ranked candidates...</div>
                     ) : (
-                        <RankedApplicantsTable rankedCandidates={rankedCandidates} />
+                        <div className="bg-card rounded-xl border shadow-sm p-4 mt-6">
+                            <RankedApplicantsTable rankedCandidates={rankedCandidates} />
+                        </div>
                     )
                 )}
         </div>

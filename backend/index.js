@@ -31,9 +31,18 @@ import { Server } from "socket.io";
 
 const app = express();
 const server = http.createServer(app);
+const allowedOrigins = [
+  "http://localhost:5173", 
+  "https://opportunebridge-frontend.onrender.com"
+];
+
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "https://opportunebridge-frontend.onrender.com"],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   }
@@ -48,7 +57,7 @@ app.use(cookieParser());
 app.use('/uploads', express.static('uploads'));
 
 const corsOptions = {
-  origin: ["http://localhost:5173", "https://opportunebridge-frontend.onrender.com"],
+  origin: allowedOrigins,
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -68,6 +77,10 @@ app.get("/api/health", (req, res) => {
     database: dbStatus,
     timestamp: new Date()
   });
+});
+
+app.get("/", (req, res) => {
+  return res.status(200).send("OpportuneBridge API is running successfully!");
 });
 
 app.use("/api/v1/user", userRoute);

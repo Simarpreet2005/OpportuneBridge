@@ -21,14 +21,18 @@ const StudentDashboard = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
-                setLoading(true);
                 // Fetch applied jobs
                 const appliedRes = await api.get("/application/get");
                 if (appliedRes.data.success) {
                     setAppliedJobs(appliedRes.data.application || []);
                 }
+            } catch (error) {
+                console.error('Failed to fetch applied jobs', error);
+            }
 
+            try {
                 // Fetch saved jobs from user profile
                 const userRes = await api.get("/user/me");
                 if (userRes.data.success && userRes.data.user.profile?.savedJobs) {
@@ -39,18 +43,21 @@ const StudentDashboard = () => {
                     const savedJobsResponses = await Promise.all(savedJobsPromises);
                     setSavedJobs(savedJobsResponses.map(res => res.data.job).filter(Boolean));
                 }
+            } catch (error) {
+                console.error('Failed to fetch saved jobs', error);
+            }
 
+            try {
                 // Fetch recent jobs
                 const jobsRes = await api.get("/job/get?limit=6");
                 if (jobsRes.data.success) {
                     setRecentJobs(jobsRes.data.jobs || []);
                 }
             } catch (error) {
-                console.error('Failed to fetch dashboard data', error);
-                toast.error('Failed to load dashboard data');
-            } finally {
-                setLoading(false);
+                console.error('Failed to fetch recent jobs', error);
             }
+            
+            setLoading(false);
         };
 
         fetchData();

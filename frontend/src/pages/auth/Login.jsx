@@ -42,7 +42,7 @@ const Login = () => {
             if (res.data.success) {
                 dispatch(setUser(res.data.user));
                 if (res.data.user.role === 'recruiter') {
-                    navigate("/admin/companies");
+                    navigate("/admin/dashboard");
                 } else if (res.data.user.role === 'admin') {
                     navigate("/admin/dashboard");
                 } else if (res.data.user.role === 'superadmin') {
@@ -70,7 +70,7 @@ const Login = () => {
                 if (res.data.success) {
                     dispatch(setUser(res.data.user));
                     if (res.data.user.role === 'recruiter') {
-                        navigate("/admin/companies");
+                        navigate("/admin/dashboard");
                     } else if (res.data.user.role === 'admin') {
                         navigate("/admin/dashboard");
                     } else if (res.data.user.role === 'superadmin') {

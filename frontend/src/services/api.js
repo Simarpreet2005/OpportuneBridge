@@ -7,7 +7,7 @@ const api = axios.create({
     timeout: 10000,
     withCredentials: true,
     headers: {
-        "Content-Type": "application/json"
+        // Let Axios automatically set Content-Type based on request body (JSON or FormData)
     }
 });
 

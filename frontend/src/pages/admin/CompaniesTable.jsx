@@ -22,7 +22,7 @@ const CompaniesTable = () => {
         setFilterCompany(filteredCompany);
     }, [companies, searchCompanyByText])
     return (
-        <div>
+        <div className="bg-card rounded-xl border shadow-sm p-4 mt-6">
             <Table>
                 <TableCaption>A list of your recent registered companies</TableCaption>
                 <TableHeader>

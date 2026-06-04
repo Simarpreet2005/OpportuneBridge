@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Avatar, AvatarImage } from '../ui/avatar'
+import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar'
 import { Button } from '../ui/button'
 import { Contact, Mail, Pen } from 'lucide-react'
 import { Badge } from '../ui/badge'
@@ -24,13 +24,10 @@ const Profile = () => {
                     <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                         <div className="flex items-center gap-4">
                             <Avatar className="h-20 w-20 md:h-24 md:w-24 border border-border/70">
-                                {user?.profile?.profilePhoto ? (
-                                    <AvatarImage src={user.profile.profilePhoto} alt="profile" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground font-semibold text-2xl md:text-3xl">
-                                        {user?.fullname?.charAt(0).toUpperCase()}
-                                    </div>
-                                )}
+                                <AvatarImage src={user?.profile?.profilePhoto} alt="profile" />
+                                <AvatarFallback className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground font-semibold text-2xl md:text-3xl rounded-full">
+                                    {user?.fullname?.charAt(0).toUpperCase()}
+                                </AvatarFallback>
                             </Avatar>
                             <div className="min-w-0">
                                 <h1 className="text-2xl md:text-3xl font-semibold tracking-tight truncate">{user?.fullname}</h1>

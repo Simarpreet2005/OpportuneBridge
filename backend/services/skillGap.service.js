@@ -61,7 +61,7 @@ Explain in 2-3 concise sentences why these missing skills are important for thei
 
                 advice = completion.choices[0]?.message?.content?.trim() || "";
             } catch (groqError) {
-                logger.error("Groq error in skill gap service", { error: groqError.message });
+                logger.warn("Groq error in skill gap service", { error: groqError.message });
                 advice = `Skills like ${missingSkills.slice(0, 2).join(" and ")} appear frequently in active job listings for your target roles.`;
             }
         } else {

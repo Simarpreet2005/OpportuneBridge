@@ -73,7 +73,11 @@ Provide 3 concise bullet points: strengths, gaps, next steps.`;
             aiExplanation: content.trim()
         };
     } catch (error) {
-        logger.error("Job Match Explanation Error", { error: error.message, stack: error.stack });
+        if (error.status === 401) {
+            logger.warn("Job Match Explanation Error", { error: error.message });
+        } else {
+            logger.error("Job Match Explanation Error", { error: error.message, stack: error.stack });
+        }
         return {
             success: true,
             aiExplanation: "Career insights temporarily unavailable. Please try again later."

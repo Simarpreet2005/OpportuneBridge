@@ -85,7 +85,7 @@ const Signup = () => {
             if (res.data.success) {
                 dispatch(setUser(res.data.user));
                 if (res.data.user.role === 'recruiter') {
-                    navigate("/admin/companies");
+                    navigate("/admin/dashboard");
                 } else if (res.data.user.role === 'admin') {
                     navigate("/admin/dashboard");
                 } else if (res.data.user.role === 'superadmin') {
@@ -105,7 +105,7 @@ const Signup = () => {
     useEffect(() => {
         if (!user) return;
         if (user.role === 'recruiter') {
-            navigate("/admin/companies");
+            navigate("/admin/dashboard");
         } else if (user.role === 'admin') {
             navigate("/admin/dashboard");
         } else if (user.role === 'superadmin') {
@@ -125,7 +125,7 @@ const Signup = () => {
                 if (res.data.success) {
                     dispatch(setUser(res.data.user));
                     if (res.data.user.role === 'recruiter') {
-                        navigate("/admin/companies");
+                        navigate("/admin/dashboard");
                     } else if (res.data.user.role === 'admin') {
                         navigate("/admin/dashboard");
                     } else if (res.data.user.role === 'superadmin') {

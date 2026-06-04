@@ -30,9 +30,7 @@ const NotificationCenter = () => {
 
     const handleMarkAsRead = async (id) => {
         try {
-            console.log("Marking notification as read:", id);
             const res = await api.post(`/notification/${id}/read`);
-            console.log("Mark as read response:", res.data);
             if (res.data.success) {
                 setNotifications(prev => 
                     prev.map(n => n._id === id ? { ...n, isRead: true } : n)

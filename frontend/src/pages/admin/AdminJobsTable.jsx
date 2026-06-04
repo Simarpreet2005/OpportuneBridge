@@ -22,7 +22,7 @@ const AdminJobsTable = () => {
         setFilterJobs(filteredJobs);
     }, [allAdminJobs, searchJobByText])
     return (
-        <div>
+        <div className="bg-card rounded-xl border shadow-sm p-4 mt-6">
             <Table>
                 <TableCaption>A list of your recent  posted jobs</TableCaption>
                 <TableHeader>
@@ -62,5 +62,3 @@ const AdminJobsTable = () => {
 }
 
 export default AdminJobsTable
-
-

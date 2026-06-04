@@ -81,7 +81,7 @@ const SkillGapInsights = () => {
                             <span className="text-xs text-muted-foreground">You match all requirements for current listings!</span>
                         ) : (
                             missingSkills.map((skill, index) => (
-                                <Badge key={index} variant="outline" className="text-xs border-warning/30 bg-warning/10 text-white dark:text-white">
+                                <Badge key={index} variant="outline" className="text-xs border-warning/30 bg-warning/10 text-black dark:text-white">
                                     + {skill}
                                 </Badge>
                             ))

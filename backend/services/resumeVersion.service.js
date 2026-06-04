@@ -155,13 +155,6 @@ export const deleteResumeVersion = async (userId, versionId) => {
             throw new Error("Resume version not found");
         }
 
-        // Get total count of versions for this user
-        const totalVersions = await ResumeVersion.countDocuments({ userId });
-
-        // Do not allow deleting last remaining resume
-        if (totalVersions === 1) {
-            throw new Error("Cannot delete the last remaining resume version");
-        }
 
         const wasActive = resumeVersion.isActive;
         const deletedUrl = resumeVersion.resumeUrl;
@@ -222,6 +215,14 @@ export const deleteResumeVersion = async (userId, versionId) => {
                         }
                         userObj.profile.resumes.push(existingResume._id);
                     }
+                    await userObj.save();
+                }
+            } else {
+                // No more versions left, clear user profile resume fields
+                const userObj = await User.findById(userId);
+                if (userObj) {
+                    userObj.profile.resume = "";
+                    userObj.profile.resumeOriginalName = "";
                     await userObj.save();
                 }
             }

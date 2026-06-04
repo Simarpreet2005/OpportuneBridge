@@ -16,11 +16,7 @@ const ProfilePicUploader = ({ setUser }) => {
 
         try {
             setLoading(true);
-            const res = await api.post("/user/profile/update", formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            const res = await api.post("/user/profile/update", formData);
             if (res.data.success) {
                 setUser(res.data.user);
                 toast.success("Profile picture updated!");

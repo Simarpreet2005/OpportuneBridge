@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { Button } from '../ui/button'
-import { Avatar, AvatarImage } from '../ui/avatar'
+import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar'
 import { LogOut, User2, Menu, X, Moon, Sun } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -129,26 +129,20 @@ const Navbar = () => {
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <Avatar className="cursor-pointer border border-border transition-transform hover:scale-105">
-                                            {user?.profile?.profilePhoto ? (
-                                                <AvatarImage src={user.profile.profilePhoto} alt="@user" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground font-semibold">
-                                                    {user?.fullname?.charAt(0).toUpperCase()}
-                                                </div>
-                                            )}
+                                            <AvatarImage src={user?.profile?.profilePhoto} alt="@user" />
+                                            <AvatarFallback className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground font-semibold rounded-full">
+                                                {user?.fullname?.charAt(0).toUpperCase()}
+                                            </AvatarFallback>
                                         </Avatar>
                                     </PopoverTrigger>
                                 <PopoverContent className="w-80 border-border bg-card shadow-xl rounded-xl mr-4">
                                     <div className=''>
                                         <div className='flex gap-3 space-y-2 items-center mb-4'>
                                             <Avatar className="cursor-pointer border border-border w-10 h-10">
-                                                {user?.profile?.profilePhoto ? (
-                                                    <AvatarImage src={user.profile.profilePhoto} alt="@user" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground font-semibold text-xs">
-                                                        {user?.fullname?.charAt(0).toUpperCase()}
-                                                    </div>
-                                                )}
+                                                <AvatarImage src={user?.profile?.profilePhoto} alt="@user" />
+                                                <AvatarFallback className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground font-semibold text-xs rounded-full">
+                                                    {user?.fullname?.charAt(0).toUpperCase()}
+                                                </AvatarFallback>
                                             </Avatar>
                                             <div>
                                                 <h4 className='font-bold text-lg leading-none'>{user?.fullname}</h4>
@@ -232,13 +226,10 @@ const Navbar = () => {
                             <div className='flex flex-col gap-3 mt-4'>
                                 <div className='flex items-center gap-3 mb-2'>
                                     <Avatar className="w-8 h-8">
-                                        {user?.profile?.profilePhoto ? (
-                                            <AvatarImage src={user.profile.profilePhoto} alt="@user" />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground font-semibold text-xs">
-                                                {user?.fullname?.charAt(0).toUpperCase()}
-                                            </div>
-                                        )}
+                                        <AvatarImage src={user?.profile?.profilePhoto} alt="@user" />
+                                        <AvatarFallback className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground font-semibold text-xs rounded-full">
+                                            {user?.fullname?.charAt(0).toUpperCase()}
+                                        </AvatarFallback>
                                     </Avatar>
                                     <span className='font-bold'>{user?.fullname}</span>
                                 </div>

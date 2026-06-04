@@ -8,14 +8,10 @@ export default function ResumeUploader({ setResumes, setUser }) {
         if (!file) return;
 
         const formData = new FormData();
-        formData.append("resume", file);
+        formData.append("file", file);
 
         try {
-            const res = await api.post("/resume/upload-version", formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            const res = await api.post("/resume/upload-version", formData);
             if (res.data.success) {
                 const userRes = await api.get("/user/me");
                 if (userRes.data.success) {

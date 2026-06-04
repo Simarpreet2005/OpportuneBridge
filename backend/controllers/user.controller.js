@@ -27,8 +27,6 @@ export const register = async (req, res) => {
             });
         };
 
-        console.log("req.file:", req.file);
-        console.log("req.body:", req.body);
 
         let profilePhotoUrl = "";
         if (req.file) {

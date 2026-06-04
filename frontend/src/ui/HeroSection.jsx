@@ -12,7 +12,7 @@ const HeroSection = ({ jobsSectionRef }) => {
 
     const searchJobHandler = () => {
         dispatch(setSearchedQuery(query));
-        navigate("/jobs");
+        navigate("/browse");
     }
 
     return (
