@@ -24,6 +24,7 @@ import notificationRoute from "./routes/notification.route.js";
 import skillGapRoute from "./routes/skillGap.route.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
 import { configureSocket } from "./services/socket.service.js";
+import printRoutes from "./utils/printRoutes.js";
 
 import http from "http";
 import { Server } from "socket.io";
@@ -49,6 +50,9 @@ const io = new Server(server, {
 });
 
 configureSocket(io);
+
+// Trust proxy required for Render to give correct IP for rate limiting
+app.set("trust proxy", 1);
 
 app.use(helmet());
 app.use(express.json({ limit: "2mb" }));
@@ -108,6 +112,8 @@ validateCloudinaryConfig();
 connectDB()
   .then(async () => {
     await seedSuperAdmin();
+    // Print all registered routes for debugging
+    printRoutes(app);
     server.listen(PORT, () => logger.info(`Server running at port ${PORT}`));
   })
   .catch((err) => logger.error("Server startup failed", { message: err.message }));
