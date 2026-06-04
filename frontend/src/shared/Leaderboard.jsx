@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Trophy, Medal } from 'lucide-react';
+import { USER_API_END_POINT } from '../constants/api';
 
 const Leaderboard = () => {
     const [users, setUsers] = useState([]);
@@ -10,7 +11,7 @@ const Leaderboard = () => {
     useEffect(() => {
         const fetchLeaderboard = async () => {
             try {
-                const res = await axios.get("https://opportunebridge-backend.onrender.com/api/v1/user/leaderboard");
+                const res = await axios.get(`${USER_API_END_POINT}/leaderboard`);
                 if (res.data.success) {
                     setUsers(res.data.leaderboard);
                 }
