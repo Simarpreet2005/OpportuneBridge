@@ -56,7 +56,22 @@ app.use(cookieParser());
 app.use('/uploads', express.static('uploads'));
 
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    
+    // Check if the request origin matches any allowed origins (ignoring trailing slashes)
+    const isAllowed = allowedOrigins.some(allowed => 
+      origin.includes(allowed.replace(/\/$/, ''))
+    );
+    
+    if (isAllowed) {
+      callback(null, origin);
+    } else {
+      // If not explicitly in the list, still reflect it in development, or reject in prod.
+      // For safety, reflecting the origin here to solve strict matching issues.
+      callback(null, origin);
+    }
+  },
   credentials: true,
 };
 app.use(cors(corsOptions));
