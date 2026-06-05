@@ -32,14 +32,9 @@ import { Server } from "socket.io";
 
 const app = express();
 const server = http.createServer(app);
-const allowedOrigins = [
-  "http://localhost:5173", 
-  "https://opportunebridge-frontend.onrender.com"
-];
-
-if (process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
-}
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : (process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, "http://localhost:5173"] : ["http://localhost:5173"]);
 
 const io = new Server(server, {
   cors: {
@@ -66,15 +61,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Apply global rate limiter to all API routes (except static assets)
-app.use('/api', globalLimiter);
-
-// Apply stricter rate limiter to auth endpoints
-app.use("/api/v1/user/login", authLimiter);
-app.use("/api/v1/user/register", authLimiter);
-app.use("/api/v1/user/google-login", authLimiter);
-
-app.get("/api/health", (req, res) => {
+// Health check (exempt from rate limits)
+app.get("/api/v1/health", (req, res) => {
   const dbStatus = mongoose.connection.readyState === 1 ? "connected" : "disconnected";
   return res.status(200).json({
     status: "ok",
@@ -82,6 +70,14 @@ app.get("/api/health", (req, res) => {
     timestamp: new Date()
   });
 });
+
+// Apply global rate limiter to all API routes (except static assets)
+app.use('/api', globalLimiter);
+
+// Apply stricter rate limiter to auth endpoints
+app.use("/api/v1/user/login", authLimiter);
+app.use("/api/v1/user/register", authLimiter);
+app.use("/api/v1/user/google-login", authLimiter);
 
 app.get("/", (req, res) => {
   return res.status(200).send("OpportuneBridge API is running successfully!");

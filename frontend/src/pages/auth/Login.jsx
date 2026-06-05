@@ -5,7 +5,7 @@ import { Input } from '../../ui/input'
 import { RadioGroup } from '../../ui/radio-group'
 import { Button } from '../../ui/button'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import axiosInstance from '../../utils/axiosConfig'
 import { USER_API_END_POINT } from '../../utils/constant'
 import { toast } from 'sonner'
 import { useDispatch, useSelector } from 'react-redux'
@@ -33,7 +33,7 @@ const Login = () => {
         e.preventDefault();
         try {
             dispatch(setLoading(true));
-            const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
+            const res = await axiosInstance.post(`${USER_API_END_POINT}/login`, input, {
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -63,7 +63,7 @@ const Login = () => {
         onSuccess: async (tokenResponse) => {
             try {
                 dispatch(setLoading(true));
-                const res = await axios.post(`${USER_API_END_POINT}/google-login`,
+                const res = await axiosInstance.post(`${USER_API_END_POINT}/google-login`,
                     { googleToken: tokenResponse.access_token, role: input.role || 'student' },
                     { withCredentials: true }
                 );

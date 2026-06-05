@@ -1,6 +1,7 @@
 import Groq from 'groq-sdk';
 import { logger } from '../utils/logger.js';
-
+import { normalizeSkill } from "../utils/skillNormalizer.js";
+import { calculateTotalExperienceMonths } from "../utils/experienceCalculator.js";
 /**
  * Parses an experience string into a minimum number of months.
  * Examples: "Fresher" -> 0, "6 months" -> 6, "1 year" -> 12, "1-3 years" -> 12, "2+ years" -> 24
@@ -35,21 +36,9 @@ export const parseExperience = (expStr) => {
 };
 
 const calculateCandidateMonths = (candidate) => {
-    // Check resumes first
     if (candidate.profile?.resumes && candidate.profile.resumes.length > 0) {
         const activeResume = candidate.profile.resumes.find(r => r.isActive) || candidate.profile.resumes[0];
-        if (activeResume.experience && activeResume.experience.length > 0) {
-            let totalMonths = 0;
-            activeResume.experience.forEach(exp => {
-                const start = new Date(exp.startDate);
-                const end = exp.isCurrent || !exp.endDate ? new Date() : new Date(exp.endDate);
-                if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-                    const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
-                    if (months > 0) totalMonths += months;
-                }
-            });
-            if (totalMonths > 0) return totalMonths;
-        }
+        return calculateTotalExperienceMonths(activeResume.experience);
     }
     return 0;
 };
@@ -62,7 +51,7 @@ const calculateSkillsScore = (candidate, jobRequirements) => {
     // Extract skills from requirements array (assuming comma separated or single strings)
     let requiredSkills = [];
     jobRequirements.forEach(req => {
-        const parts = req.split(',').map(s => s.trim().toLowerCase()).filter(s => s);
+        const parts = req.split(',').map(normalizeSkill).filter(Boolean);
         requiredSkills = requiredSkills.concat(parts);
     });
     
@@ -73,13 +62,13 @@ const calculateSkillsScore = (candidate, jobRequirements) => {
 
     let candidateSkills = [];
     if (candidate.profile?.skills) {
-        candidateSkills = candidate.profile.skills.map(s => s.toLowerCase().trim());
+        candidateSkills = candidate.profile.skills.map(normalizeSkill).filter(Boolean);
     }
     
     if (candidate.profile?.resumes && candidate.profile.resumes.length > 0) {
         const activeResume = candidate.profile.resumes.find(r => r.isActive) || candidate.profile.resumes[0];
         if (activeResume.skills) {
-            candidateSkills = candidateSkills.concat(activeResume.skills.map(s => s.toLowerCase().trim()));
+            candidateSkills = candidateSkills.concat(activeResume.skills.map(normalizeSkill).filter(Boolean));
         }
     }
     

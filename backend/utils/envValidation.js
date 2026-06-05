@@ -7,7 +7,8 @@ const requiredEnvVars = [
     'CLOUDINARY_CLOUD_NAME',
     'CLOUDINARY_API_KEY',
     'CLOUDINARY_API_SECRET',
-    'GROQ_API_KEY'
+    'GROQ_API_KEY',
+    'ALLOWED_ORIGINS'
 ];
 
 const optionalEnvVars = [

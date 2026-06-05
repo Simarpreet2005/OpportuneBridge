@@ -1,18 +1,20 @@
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../store/authSlice";
 import api from "../api";
 import ResumeUploader from "./ResumeUploader";
 import ProfilePicUploader from "./ProfilePicUploader";
 
 export default function Dashboard() {
-    const { user, setUser } = useContext(AuthContext);
+    const { user } = useSelector(store => store.auth);
+    const dispatch = useDispatch();
     const [resumes, setResumes] = useState([]);
 
     useEffect(() => {
         async function load() {
             try {
                 const res = await api.get("/user/me");
-                setUser(res.data.user);
+                dispatch(setUser(res.data.user));
                 setResumes(res.data.user.profile?.resumes || []); 
             } catch (error) {
                 console.error("Failed to load profile", error);
@@ -27,7 +29,7 @@ export default function Dashboard() {
 
             <div className="mb-8">
                 <h2 className="text-xl font-semibold mb-2">Profile Picture</h2>
-                <ProfilePicUploader setUser={setUser} />
+                <ProfilePicUploader setUser={(u) => dispatch(setUser(u))} />
                 {user?.profile?.profilePhoto && (
                     <img src={user.profile.profilePhoto} alt="Profile" className="w-32 h-32 rounded-full object-cover mt-4" />
                 )}
@@ -35,7 +37,7 @@ export default function Dashboard() {
 
             <div className="mb-8">
                 <h2 className="text-xl font-semibold mb-2">Upload Resume</h2>
-                <ResumeUploader setResumes={setResumes} setUser={setUser} />
+                <ResumeUploader setResumes={setResumes} setUser={(u) => dispatch(setUser(u))} />
             </div>
 
             <div>

@@ -1,7 +1,8 @@
 import { Job } from "../models/job.model.js";
 import { User } from "../models/user.model.js";
 import { Resume } from "../models/resume.model.js";
-
+import { normalizeSkill } from "../utils/skillNormalizer.js";
+import { calculateTotalExperienceYears } from "../utils/experienceCalculator.js";
 const extractYearsExp = (expStr) => {
     if (!expStr) return 0;
     const lower = expStr.toLowerCase();
@@ -11,19 +12,7 @@ const extractYearsExp = (expStr) => {
     return 0; // default 0
 };
 
-const calculateTotalExperienceYears = (experiences) => {
-    if (!experiences || experiences.length === 0) return 0;
-    let totalMonths = 0;
-    experiences.forEach(exp => {
-        const start = new Date(exp.startDate);
-        const end = exp.isCurrent || !exp.endDate ? new Date() : new Date(exp.endDate);
-        if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-            const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
-            if (months > 0) totalMonths += months;
-        }
-    });
-    return totalMonths / 12;
-};
+
 
 const matchEducation = (jobStr, educations) => {
     if (!educations || educations.length === 0) return 0; // none
@@ -66,18 +55,18 @@ export const calculateJobMatchScore = (user, resume, job) => {
         ...(user?.profile?.skills || []),
         ...(resume?.skills || []),
         ...(resume?.aiAnalysis?.matchedSkills || [])
-    ].map(s => s.toLowerCase().trim()));
+    ].map(normalizeSkill).filter(Boolean));
     
     // convert Set back to array for iteration
     const userSkills = Array.from(userSkillsSet);
 
-    const jobSkills = (job.requirements || []).map(s => s.toLowerCase().trim());
+    const jobSkills = (job.requirements || []).map(normalizeSkill).filter(Boolean);
     const totalRequiredSkills = jobSkills.length;
 
     let matchedSkills = [];
     let missingSkills = [];
 
-    jobSkills.forEach(req => {
+    jobSkills.forEach((req, index) => {
         let isMatch = false;
         for (const skill of userSkills) {
             if (!skill || !req) continue;
@@ -88,9 +77,9 @@ export const calculateJobMatchScore = (user, resume, job) => {
             }
         }
         if (isMatch) {
-            matchedSkills.push(req);
+            matchedSkills.push(job.requirements[index]);
         } else {
-            missingSkills.push(req);
+            missingSkills.push(job.requirements[index]);
         }
     });
 
@@ -129,6 +118,11 @@ export const calculateJobMatchScore = (user, resume, job) => {
 
     return {
         matchScore,
+        scoreBreakdown: {
+            skills: Math.round(skillsScore),
+            experience: Math.round(expScore),
+            education: Math.round(eduScore)
+        },
         matchedSkills,
         missingSkills,
         strengths

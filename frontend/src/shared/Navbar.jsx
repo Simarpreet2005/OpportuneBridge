@@ -10,6 +10,7 @@ import axios from 'axios'
 import { USER_API_END_POINT } from '../utils/constant'
 import { setUser } from '../store/authSlice'
 import { toast } from 'sonner'
+import { getNavigationLinks } from '../config/navigation'
 
 const Navbar = () => {
     const { user } = useSelector(store => store.auth);
@@ -17,9 +18,6 @@ const Navbar = () => {
     const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isDark, setIsDark] = useState(false);
-    const isSuperadmin = user?.role === "superadmin";
-    const isAdminPanel = user?.role === "admin" || user?.role === "recruiter";
-    const isStudent = user?.role === "student";
 
     useEffect(() => {
         setIsDark(document.documentElement.classList.contains("dark"));
@@ -73,29 +71,13 @@ const Navbar = () => {
                 {/* Desktop Menu */}
                 <div className='hidden md:flex items-center gap-12'>
                     <ul className='flex font-medium items-center gap-4 text-foreground/80'>
-                        {
-                            isSuperadmin ? (
-                                <>
-                                    <li><Link to="/superadmin/dashboard"><Button className="rounded-full bg-primary hover:bg-primary-hover text-primary-foreground">Dashboard</Button></Link></li>
-                                    <li><Link to="/superadmin/users"><Button className="rounded-full bg-primary hover:bg-primary-hover text-primary-foreground">Users</Button></Link></li>
-                                    <li><Link to="/superadmin/analytics"><Button className="rounded-full bg-primary hover:bg-primary-hover text-primary-foreground">Analytics</Button></Link></li>
-                                </>
-                            ) : isAdminPanel ? (
-                                <>
-                                    <li><Link to="/admin/dashboard"><Button className="rounded-full bg-primary hover:bg-primary-hover text-primary-foreground">Dashboard</Button></Link></li>
-                                    <li><Link to="/admin/companies"><Button className="rounded-full bg-primary hover:bg-primary-hover text-primary-foreground">Companies</Button></Link></li>
-                                    <li><Link to="/admin/jobs"><Button className="rounded-full bg-primary hover:bg-primary-hover text-primary-foreground">Jobs</Button></Link></li>
-                                </>
-                            ) : (
-                                <>
-                                    <li><Link to="/"><Button className="rounded-full bg-primary hover:bg-primary-hover text-primary-foreground">Home</Button></Link></li>
-                                    {isStudent && <li><Link to="/dashboard"><Button className="rounded-full bg-primary hover:bg-primary-hover text-primary-foreground">Dashboard</Button></Link></li>}
-                                    <li><Link to="/jobs"><Button className="rounded-full bg-primary hover:bg-primary-hover text-primary-foreground">Find Jobs</Button></Link></li>
-                                    <li onClick={() => handleProtectedNavigation("/saved-jobs", "Please login to view saved jobs")}><Link to="/saved-jobs"><Button className="rounded-full bg-primary hover:bg-primary-hover text-primary-foreground">Saved Jobs</Button></Link></li>
-                                    <li onClick={() => handleProtectedNavigation("/career-assistant", "Please login to access career assistant")}><Link to="/career-assistant"><Button className="rounded-full bg-primary hover:bg-primary-hover text-primary-foreground">Career Assistant</Button></Link></li>
-                                </>
-                            )
-                        }
+                        {getNavigationLinks(user).map((link, idx) => (
+                            <li key={idx} onClick={link.protected ? (e) => { e.preventDefault(); handleProtectedNavigation(link.path, link.message); } : undefined}>
+                                <Link to={link.path}>
+                                    <Button className="rounded-full bg-primary hover:bg-primary-hover text-primary-foreground">{link.label}</Button>
+                                </Link>
+                            </li>
+                        ))}
                     </ul>
                     {
                         !user ? (
@@ -194,29 +176,19 @@ const Navbar = () => {
             {isMobileMenuOpen && (
                 <div className='md:hidden absolute top-16 left-0 w-full bg-background border-b border-border p-4 shadow-xl animate-in slide-in-from-top-2'>
                     <div className='flex flex-col space-y-4'>
-                        {
-                            isSuperadmin ? (
-                                <>
-                                    <Link to="/superadmin/dashboard" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
-                                    <Link to="/superadmin/users" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => setIsMobileMenuOpen(false)}>Users</Link>
-                                    <Link to="/superadmin/analytics" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => setIsMobileMenuOpen(false)}>Analytics</Link>
-                                </>
-                            ) : isAdminPanel ? (
-                                <>
-                                    <Link to="/admin/dashboard" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
-                                    <Link to="/admin/companies" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => setIsMobileMenuOpen(false)}>Companies</Link>
-                                    <Link to="/admin/jobs" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => setIsMobileMenuOpen(false)}>Jobs</Link>
-                                </>
-                            ) : (
-                                <>
-                                    <Link to="/" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-                                    {isStudent && <Link to="/dashboard" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>}
-                                    <Link to="/jobs" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => setIsMobileMenuOpen(false)}>Find Jobs</Link>
-                                    <Link to="/saved-jobs" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => { handleProtectedNavigation("/saved-jobs", "Please login to view saved jobs"); setIsMobileMenuOpen(false); }}>Saved Jobs</Link>
-                                    <Link to="/career-assistant" className='text-lg font-medium py-2 border-b border-border/50' onClick={() => { handleProtectedNavigation("/career-assistant", "Please login to access career assistant"); setIsMobileMenuOpen(false); }}>Career Assistant</Link>
-                                </>
-                            )
-                        }
+                        {getNavigationLinks(user).map((link, idx) => (
+                            <Link 
+                                key={idx} 
+                                to={link.path} 
+                                className='text-lg font-medium py-2 border-b border-border/50' 
+                                onClick={(e) => { 
+                                    if (link.protected) { e.preventDefault(); handleProtectedNavigation(link.path, link.message); } 
+                                    setIsMobileMenuOpen(false); 
+                                }}
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
                         {!user ? (
                             <div className='flex flex-col gap-3 mt-4'>
                                 <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}><Button variant="outline" className="w-full rounded-full">Login</Button></Link>
