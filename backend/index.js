@@ -112,4 +112,4 @@ connectDB()
     printRoutes(app);
     server.listen(PORT, () => logger.info(`Server running at port ${PORT}`));
   })
-  .catch((err) => logger.error("Server startup failed", { message: err.message }));
+  .catch((err) => logger.error("Server startup failed", { message: err?.message || "Unknown error", stack: err?.stack, error: err }));

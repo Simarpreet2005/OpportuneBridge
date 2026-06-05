@@ -2,14 +2,14 @@ const printRoutes = (app) => {
   const routes = [];
   
   const printPaths = (path, layer) => {
-    if (layer.route) {
+    if (layer?.route?.stack) {
       layer.route.stack.forEach((route) => {
         routes.push({
           method: route.method ? route.method.toUpperCase() : 'ALL',
           path: path + layer.route.path
         });
       });
-    } else if (layer.name === 'router' && layer.handle.stack) {
+    } else if (layer?.name === 'router' && layer?.handle?.stack) {
       layer.handle.stack.forEach((stackItem) => {
         let routePath = layer.regexp.source
           .replace('^', '')
@@ -26,7 +26,7 @@ const printRoutes = (app) => {
     }
   };
 
-  app._router.stack.forEach((layer) => {
+  app?._router?.stack?.forEach((layer) => {
     printPaths('', layer);
   });
 
