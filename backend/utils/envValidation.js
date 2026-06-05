@@ -7,17 +7,19 @@ const requiredEnvVars = [
     'CLOUDINARY_CLOUD_NAME',
     'CLOUDINARY_API_KEY',
     'CLOUDINARY_API_SECRET',
-    'GROQ_API_KEY',
-    'ALLOWED_ORIGINS'
+    'GROQ_API_KEY'
 ];
 
 const optionalEnvVars = [
     'NODE_ENV',
     'FRONTEND_URL',
+    'ALLOWED_ORIGINS',
     'EMAIL_HOST',
     'EMAIL_PORT',
     'EMAIL_USER',
-    'EMAIL_PASS'
+    'EMAIL_PASS',
+    'GOOGLE_CLIENT_ID',
+    'GOOGLE_CLIENT_SECRET'
 ];
 
 export const validateEnv = () => {

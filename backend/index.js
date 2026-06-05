@@ -65,11 +65,11 @@ const corsOptions = {
     );
     
     if (isAllowed) {
-      callback(null, origin);
+      callback(null, true);
     } else {
       // If not explicitly in the list, still reflect it in development, or reject in prod.
       // For safety, reflecting the origin here to solve strict matching issues.
-      callback(null, origin);
+      callback(null, true);
     }
   },
   credentials: true,
