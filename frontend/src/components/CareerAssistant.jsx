@@ -19,7 +19,7 @@ const CareerAssistant = () => {
 
     const fetchSuggestedPrompts = async () => {
         try {
-            const res = await api.get(`${CAREER_ASSISTANT_API_END_POINT}/suggested-prompts`);
+            const res = await api.get(`${CAREER_ASSISTANT_API_END_POINT}/suggested-prompts`, { timeout: 60000 });
             if (res.data.success) {
                 setSuggestedPrompts(res.data.data?.prompts ?? res.data.prompts ?? []);
             }
@@ -47,7 +47,8 @@ const CareerAssistant = () => {
         try {
             const res = await api.post(
                 `${CAREER_ASSISTANT_API_END_POINT}/advice`,
-                { query }
+                { query },
+                { timeout: 60000 }
             );
 
             if (res.data.success) {

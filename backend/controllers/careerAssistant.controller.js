@@ -38,7 +38,7 @@ export const getCareerAdvice = async (req, res) => {
             if (result.isUnrelated) {
                 return errorResponse(res, 400, result.message);
             } else {
-                return errorResponse(res, 503, "Career Assistant temporarily unavailable");
+                return errorResponse(res, 503, result.message);
             }
         }
 

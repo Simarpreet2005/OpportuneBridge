@@ -118,7 +118,7 @@ export const generateCareerResponse = async (query, user, applications, jobs) =>
         logger.error("Career Assistant Groq Error", { error: error.message, stack: error.stack });
         return {
             success: false,
-            message: error.message.includes('API key') ? "Career Assistant is not configured. Please contact support." : "Career Assistant temporarily unavailable. Please try again later."
+            message: /api key/i.test(error.message) ? "Invalid Groq API Key. Please update GROQ_API_KEY in backend/.env file." : "Career Assistant temporarily unavailable. Please try again later."
         };
     }
 };
