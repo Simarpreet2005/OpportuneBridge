@@ -3,6 +3,7 @@ import authSlice from "./authSlice";
 import jobSlice from "./jobSlice";
 import {
     persistReducer,
+    createTransform,
     FLUSH,
     REHYDRATE,
     PAUSE,
@@ -14,10 +15,26 @@ import storage from 'redux-persist/lib/storage'
 import companySlice from "./companySlice";
 import applicationSlice from "./applicationSlice";
 
+const authTransform = createTransform(
+    (inboundState, key) => {
+        if (key === "auth") {
+            return { ...inboundState, loading: false };
+        }
+        return inboundState;
+    },
+    (outboundState, key) => {
+        if (key === "auth") {
+            return { ...outboundState, loading: false };
+        }
+        return outboundState;
+    }
+);
+
 const persistConfig = {
     key: 'root',
     version: 1,
     storage,
+    transforms: [authTransform],
 }
 
 const rootReducer = combineReducers({

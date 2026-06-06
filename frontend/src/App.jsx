@@ -10,7 +10,9 @@ import { adminRoutes } from "./routes/adminRoutes"
 import { superAdminRoutes } from "./routes/superAdminRoutes"
 
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { useDispatch } from "react-redux";
 import { BASE_URL } from "./constants/api";
+import { setLoading } from "./store/authSlice";
 
 const Layout = () => {
   return (
@@ -39,10 +41,13 @@ const appRouter = createBrowserRouter([
 ])
 
 function App() {
+  const dispatch = useDispatch();
+
   useEffect(() => {
+    dispatch(setLoading(false));
     // Silently ping backend to wake it up from Render cold start
     fetch(`${BASE_URL}/health`).catch(() => {});
-  }, []);
+  }, [dispatch]);
 
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
