@@ -79,8 +79,8 @@ const CareerAssistant = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6">
-            <Card className="h-[700px] flex flex-col">
+        <div className="max-w-4xl mx-auto p-6 bg-white min-h-screen">
+            <Card className="min-h-[700px] flex flex-col border-none shadow-none">
                 <CardHeader className="border-b">
                     <div className="flex items-center gap-2">
                         <Sparkles className="w-6 h-6 text-primary" />
@@ -92,7 +92,7 @@ const CareerAssistant = () => {
                 </CardHeader>
                 
                 <CardContent className="flex-1 flex flex-col p-0">
-                    <div className="flex-1 p-4 overflow-y-auto">
+                    <div className="flex-1 p-4">
                         <div className="space-y-4">
                             {messages.length === 0 && (
                                 <div className="text-center py-8">
@@ -169,7 +169,7 @@ const CareerAssistant = () => {
                         </div>
                     </div>
 
-                    <div className="border-t p-4">
+                    <div className="border-t p-4 sticky bottom-0 bg-white">
                         <form onSubmit={handleSubmit} className="flex gap-2">
                             <Input
                                 value={query}
