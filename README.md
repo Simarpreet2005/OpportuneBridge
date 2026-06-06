@@ -164,16 +164,17 @@ Open your browser and navigate to `http://localhost:5173` (or the port shown in 
      - `VITE_API_URL`: Your deployed backend URL (e.g., `https://opportunebridge-backend.onrender.com/api/v1`)
 4. Deploy
 
-### Option 2: Vercel
+### Option 2: Vercel Frontend + Render Backend
 
-#### Using vercel.json (Auto-configuration)
+The included `vercel.json` is for hosting the React frontend only. The backend uses a long-running Express server with Socket.IO, so deploy it to Render or another service that supports WebSockets.
+
+#### Using vercel.json (Frontend Auto-configuration)
 1. Push your code to GitHub
 2. Connect your repository to Vercel
-3. Vercel will automatically detect the `vercel.json` configuration
-4. Set environment variables for backend in Vercel dashboard:
-   - Copy all variables from `backend/.env.example`
-5. Set environment variable for frontend:
-   - `VITE_API_URL`: Your deployed backend URL
+3. Vercel will automatically detect the `vercel.json` configuration and build `frontend`
+4. Set frontend environment variables:
+   - `VITE_API_URL`: Your deployed backend URL (for example, `https://opportunebridge-backend.onrender.com/api/v1`)
+   - `VITE_GOOGLE_CLIENT_ID`: Your Google OAuth client ID
 6. Deploy
 
 ### Important Deployment Notes
@@ -182,7 +183,8 @@ Open your browser and navigate to `http://localhost:5173` (or the port shown in 
 - **MongoDB URI**: Use MongoDB Atlas for production deployments
 - **CORS Configuration**: Update `ALLOWED_ORIGINS` in backend environment variables to include your deployed frontend URL
 - **Health Check**: Backend has a health check endpoint at `/api/v1/health`
-- **Socket.io**: The backend uses Socket.io for real-time features - ensure your deployment platform supports WebSockets (Vercel Serverless functions do NOT support WebSockets, use Render for full Socket.io support).
+- **Socket.io**: The backend uses Socket.io for real-time features - ensure your backend deployment platform supports WebSockets (Vercel Serverless functions do NOT support WebSockets, use Render for the backend).
+- **Frontend Routing**: Render static hosting needs the rewrite rule in `render.yaml` so direct visits to React Router paths serve `index.html`.
 
 ---
 
