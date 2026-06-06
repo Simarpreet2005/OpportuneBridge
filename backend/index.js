@@ -32,13 +32,32 @@ import { Server } from "socket.io";
 
 const app = express();
 const server = http.createServer(app);
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
-  : (process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, "http://localhost:5173"] : ["http://localhost:5173"]);
+const defaultOrigins = [
+  "http://localhost:5173",
+  "https://opportune-bridge.vercel.app",
+];
+const configuredOrigins = [
+  ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",") : []),
+  process.env.FRONTEND_URL,
+  ...defaultOrigins,
+];
+const allowedOrigins = [...new Set(
+  configuredOrigins
+    .filter(Boolean)
+    .map(origin => origin.trim().replace(/\/$/, ""))
+)];
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  const normalizedOrigin = origin.replace(/\/$/, "");
+  return allowedOrigins.includes(normalizedOrigin);
+};
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      callback(null, isAllowedOrigin(origin));
+    },
     methods: ["GET", "POST"],
     credentials: true,
   }
@@ -57,24 +76,14 @@ app.use('/uploads', express.static('uploads'));
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    
-    // Check if the request origin matches any allowed origins (ignoring trailing slashes)
-    const isAllowed = allowedOrigins.some(allowed => 
-      origin.includes(allowed.replace(/\/$/, ''))
-    );
-    
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      // If not explicitly in the list, still reflect it in development, or reject in prod.
-      // For safety, reflecting the origin here to solve strict matching issues.
-      callback(null, true);
-    }
+    callback(null, isAllowedOrigin(origin));
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 
 // Health check (exempt from rate limits)
 app.get("/api/v1/health", (req, res) => {
