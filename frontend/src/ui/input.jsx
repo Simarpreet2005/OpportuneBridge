@@ -4,12 +4,17 @@ import { cn } from "../lib/utils"
 
 function Input({
   className,
+  id,
   type,
   ...props
 }) {
   const isFile = type === "file";
+  const generatedId = React.useId();
+  const inputId = id || generatedId;
+
   return (
     <input
+      id={inputId}
       type={type}
       data-slot="input"
       className={cn(

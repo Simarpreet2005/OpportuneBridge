@@ -41,7 +41,7 @@ const appRouter = createBrowserRouter([
 function App() {
   useEffect(() => {
     // Silently ping backend to wake it up from Render cold start
-    fetch(`${BASE_URL}/health`, { mode: "no-cors" }).catch(() => {});
+    fetch(`${BASE_URL}/health`).catch(() => {});
   }, []);
 
   return (

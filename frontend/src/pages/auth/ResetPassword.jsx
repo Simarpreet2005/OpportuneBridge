@@ -57,6 +57,8 @@ const ResetPassword = () => {
                                 <Label>New password</Label>
                                 <div className="relative">
                                     <Input
+                                        id="new-password"
+                                        name="new-password"
                                         type={showPassword ? "text" : "password"}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
@@ -76,6 +78,8 @@ const ResetPassword = () => {
                             <div className="space-y-2">
                                 <Label>Confirm password</Label>
                                 <Input
+                                    id="confirm-password"
+                                    name="confirm-password"
                                     type="password"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -99,4 +103,3 @@ const ResetPassword = () => {
 }
 
 export default ResetPassword
-

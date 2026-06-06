@@ -47,6 +47,8 @@ const ForgotPassword = () => {
                             <div className="space-y-2">
                                 <Label>Email</Label>
                                 <Input
+                                    id="forgot-email"
+                                    name="email"
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
