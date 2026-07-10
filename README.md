@@ -140,51 +140,13 @@ Open your browser and navigate to `http://localhost:5173` (or the port shown in 
 
 ## Deployment
 
-### Option 1: Render (Recommended)
-
 #### Backend Deployment
-1. Push your code to GitHub
-2. Create a new **Web Service** on Render
-3. Connect your repository
-4. Configure the service:
-   - **Root Directory**: `backend`
-   - **Build Command**: `npm install`
-   - **Start Command**: `node index.js`
-   - **Environment Variables**: Copy from `backend/.env.example`
-5. Deploy
+
+https://opportunebridge.onrender.com
 
 #### Frontend Deployment
-1. Create a new **Static Site** on Render
-2. Connect your repository
-3. Configure the service:
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm install && npm run build`
-   - **Publish Directory**: `dist`
-   - **Environment Variables**: 
-     - `VITE_API_URL`: Your deployed backend URL (e.g., `https://opportunebridge-backend.onrender.com/api/v1`)
-4. Deploy
 
-### Option 2: Vercel Frontend + Render Backend
-
-The included `vercel.json` is for hosting the React frontend only. The backend uses a long-running Express server with Socket.IO, so deploy it to Render or another service that supports WebSockets.
-
-#### Using vercel.json (Frontend Auto-configuration)
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Vercel will automatically detect the `vercel.json` configuration and build `frontend`
-4. Set frontend environment variables:
-   - `VITE_API_URL`: Your deployed backend URL (for example, `https://opportunebridge-backend.onrender.com/api/v1`)
-   - `VITE_GOOGLE_CLIENT_ID`: Your Google OAuth client ID
-6. Deploy
-
-### Important Deployment Notes
-
-- **Environment Variables**: Never commit `.env` files. Use `.env.example` as a template
-- **MongoDB URI**: Use MongoDB Atlas for production deployments
-- **CORS Configuration**: Update `ALLOWED_ORIGINS` in backend environment variables to include your deployed frontend URL
-- **Health Check**: Backend has a health check endpoint at `/api/v1/health`
-- **Socket.io**: The backend uses Socket.io for real-time features - ensure your backend deployment platform supports WebSockets (Vercel Serverless functions do NOT support WebSockets, use Render for the backend).
-- **Frontend Routing**: Render static hosting needs the rewrite rule in `render.yaml` so direct visits to React Router paths serve `index.html`.
+https://opportune-bridge.vercel.app
 
 ---
 
